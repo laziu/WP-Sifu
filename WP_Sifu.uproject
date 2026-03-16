@@ -7,7 +7,13 @@
 		{
 			"Name": "WP_Sifu",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"UMG",
+				"StateTreeModule",
+				"GameplayAbilities"
+			]
 		}
 	],
 	"Plugins": [
