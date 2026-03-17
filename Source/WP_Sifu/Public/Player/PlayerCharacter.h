@@ -9,8 +9,6 @@
 
 UCLASS()
 class WP_SIFU_API APlayerCharacter : public ACharacter, public IAbilitySystemInterface
-
-
 {
 	GENERATED_BODY()
 

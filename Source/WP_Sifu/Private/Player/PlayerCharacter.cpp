@@ -28,6 +28,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Setup owner for ability system component
 	AbilitySystemComp->InitAbilityActorInfo(this, this);
 }
 
