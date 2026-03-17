@@ -21,6 +21,7 @@ public class WP_Sifu : ModuleRules
 		PublicIncludePaths.AddRange(new string[]
 		{
 			"WP_Sifu/Public",
+			"WP_Sifu/Public/Interface",
 			"WP_Sifu/Public/Player",
 		});
 	}
