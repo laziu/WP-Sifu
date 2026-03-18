@@ -13,7 +13,7 @@ public class WP_Sifu : ModuleRules
 			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Niagara",
 			"UMG", "Slate", "SlateCore",
 			"AIModule", "StateTreeModule", "GameplayStateTreeModule",
-			"GameplayAbilities", "GameplayTags", "GameplayTasks",
+			"GameplayAbilities", "GameplayTags", "GameplayTasks", "NavigationSystem"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
