@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "Attackable.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
-class WP_SIFU_API APlayerCharacter : public ACharacter, public IAbilitySystemInterface
+class WP_SIFU_API APlayerCharacter : public ACharacter, public IAbilitySystemInterface, public IAttackable
 {
 	GENERATED_BODY()
 
@@ -30,9 +31,15 @@ public:
 	// AbilitySystemInterface
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	// IAttackable
+	virtual UCombatComponentBase* GetCombatComponent() const override;
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Abilities)
 	TObjectPtr<class UAbilitySystemComponent> AbilitySystemComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
+	TObjectPtr<class UPlayerCombatComponent> CombatComp;
 
 	UPROPERTY()
 	TObjectPtr<class UHealthAttributeSet> HealthAttribs;

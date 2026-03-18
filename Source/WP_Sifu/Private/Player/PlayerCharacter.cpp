@@ -5,6 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "HealthAttributeSet.h"
+#include "PlayerCombatComponent.h"
 
 
 // Sets default values
@@ -16,6 +17,7 @@ APlayerCharacter::APlayerCharacter()
 	// Set ability system
 	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
 	HealthAttribs = CreateDefaultSubobject<UHealthAttributeSet>(TEXT("HealthAttributes"));
+	CombatComp = CreateDefaultSubobject<UPlayerCombatComponent>(TEXT("CombatComponent"));
 
 	HealthAttribs->InitHealth(MaxHealth);
 	HealthAttribs->InitMaxHealth(MaxHealth);
@@ -47,4 +49,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 UAbilitySystemComponent* APlayerCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComp;
+}
+
+UCombatComponentBase* APlayerCharacter::GetCombatComponent() const
+{
+	return CombatComp;
 }
