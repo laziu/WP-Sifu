@@ -6,27 +6,23 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "HealthAttributeSet.h"
-#include "WP_Sifu.h"
 
 
-void UPlayerCombatComponent::BeginPlay()
+UPlayerCombatComponent::UPlayerCombatComponent()
 {
-	Super::BeginPlay();
+	bWantsInitializeComponent = true;
+}
 
-	if (const auto ASI = Cast<IAbilitySystemInterface>(GetOwner()))
-	{
-		AbilitySystemComp = ASI->GetAbilitySystemComponent();
-	}
+void UPlayerCombatComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	const auto ASI = CastChecked<IAbilitySystemInterface>(GetOwner());
+	AbilitySystemComp = ASI->GetAbilitySystemComponent();
 }
 
 EAttackResponse UPlayerCombatComponent::ApplyDamage(const FAttackPayload& Payload)
 {
-	if (!AbilitySystemComp)
-	{
-		LOGE(TEXT("AbilitySystemComp is null: cannot apply damage"));
-		return EAttackResponse::Ignore;
-	}
-
 	switch (DefenceState)
 	{
 	case EDefenceState::None:
