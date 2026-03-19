@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "HealthAttributeSet.h"
 #include "PlayerCombatComponent.h"
+#include "UserExtension.h"
 
 
 // Sets default values
@@ -15,9 +16,9 @@ APlayerCharacter::APlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Set ability system
-	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
-	HealthAttribs = CreateDefaultSubobject<UHealthAttributeSet>(TEXT("HealthAttributes"));
-	CombatComp = CreateDefaultSubobject<UPlayerCombatComponent>(TEXT("CombatComponent"));
+	EXT_CREATE_SUBOBJECT(AbilitySystemComp);
+	EXT_CREATE_SUBOBJECT(HealthAttribs);
+	EXT_CREATE_SUBOBJECT(CombatComp);
 
 	HealthAttribs->InitHealth(MaxHealth);
 	HealthAttribs->InitMaxHealth(MaxHealth);
