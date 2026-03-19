@@ -2,11 +2,10 @@
 
 #include <functional>
 #include "CoreMinimal.h"
-#include "Utils.generated.h"
+#include "UserExtension.generated.h"
 
 
-// helper codes
-namespace Utils
+namespace Ext
 {
 	template <class T>
 	bool SetObject(TObjectPtr<T>& Target, const TCHAR* ObjectToFind)
