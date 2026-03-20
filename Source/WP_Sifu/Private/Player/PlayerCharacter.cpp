@@ -15,10 +15,18 @@ APlayerCharacter::APlayerCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Set mesh
+	if (auto TempMesh = Ext::OpenObject<USkeletalMesh>(TEXT(
+		"/Script/Engine.SkeletalMesh'/Game/ART_FROM_SIFU/Player/SK_M_MainChar_01/SkeletalMeshes/SK_M_MainChar_01.SK_M_MainChar_01'")))
+	{
+		GetMesh()->SetSkeletalMesh(TempMesh);
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0., 0., -88.), FRotator(0., 0., -90.));
+	}
+
 	// Set ability system
-	EXT_CREATE_SUBOBJECT(AbilitySystemComp);
-	EXT_CREATE_SUBOBJECT(HealthAttribs);
-	EXT_CREATE_SUBOBJECT(CombatComp);
+	EXT_CREATE_SUBOBJECT(AbilitySystemComp, TEXT("AbilitySystemComponent"));
+	EXT_CREATE_SUBOBJECT(HealthAttribs, TEXT("HealthAttributes"));
+	EXT_CREATE_SUBOBJECT(CombatComp, TEXT("CombatComponent"));
 
 	HealthAttribs->InitHealth(MaxHealth);
 	HealthAttribs->InitMaxHealth(MaxHealth);
