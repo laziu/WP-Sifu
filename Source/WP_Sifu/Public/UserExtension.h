@@ -88,7 +88,27 @@ namespace Ext
 	};
 }
 
-#define EXT_CREATE_SUBOBJECT(Target) \
+#define EXT_CREATE_SUBOBJECT_2_ARGS(Target, ObjectName) \
 { \
-	Ext::Bind(this).CreateSubobject(Target, TEXT(#Target)); \
+	Ext::Bind(this).CreateSubobject(Target, ObjectName); \
 }
+#define EXT_CREATE_SUBOBJECT_1_ARGS(Target) \
+	EXT_CREATE_SUBOBJECT_2_ARGS(Target, TEXT(#Target))
+#define EXT_CREATE_SUBOBJECT__MACRO_SELECTOR(x, _1, _2, ...) _2
+/**
+ * @brief Wrapper macro of @c UObject::CreateDefaultSubobject .
+ * @note Must be called inside a UObject constructor where @c this is valid.
+ * @param Target      The TObjectPtr member variable to receive the created subobject.
+ *                    Its template type is used to deduce the subobject class.
+ * @param ObjectName  (Optional) The FName used to identify the subobject.
+ *                    If omitted, the variable name of @p Target is used as the FName.
+ * @code 
+ *   // 1-arg form — uses the variable name "MeshComp" as the subobject FName.
+ *   EXT_CREATE_SUBOBJECT(MeshComp);
+ *   // 2-arg form — uses a custom FName for the subobject.
+ *   EXT_CREATE_SUBOBJECT(MeshComp, TEXT("MyCustomName"));
+ * @endcode
+ */
+#define EXT_CREATE_SUBOBJECT(...) \
+	EXT_CREATE_SUBOBJECT__MACRO_SELECTOR(__VA_ARGS__, \
+	EXT_CREATE_SUBOBJECT_2_ARGS, EXT_CREATE_SUBOBJECT_1_ARGS)(__VA_ARGS__)
