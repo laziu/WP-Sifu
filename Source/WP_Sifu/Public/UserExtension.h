@@ -81,20 +81,20 @@ namespace Ext
 
 		// CreateDefaultSubobject helper function
 		template <class T>
-		void CreateSubobject(TObjectPtr<T>& Target, FName ObjectName) const
+		void CreateDefaultSubobject(TObjectPtr<T>& Target, FName ObjectName) const
 		{
 			Target = Owner->CreateDefaultSubobject<T>(ObjectName);
 		}
 	};
 }
 
-#define EXT_CREATE_SUBOBJECT_2_ARGS(Target, ObjectName) \
+#define EXT_CREATE_DEFAULT_SUBOBJECT_2_ARGS(Target, ObjectName) \
 { \
-	Ext::Bind(this).CreateSubobject(Target, ObjectName); \
+	Ext::Bind(this).CreateDefaultSubobject(Target, ObjectName); \
 }
-#define EXT_CREATE_SUBOBJECT_1_ARGS(Target) \
-	EXT_CREATE_SUBOBJECT_2_ARGS(Target, TEXT(#Target))
-#define EXT_CREATE_SUBOBJECT__MACRO_SELECTOR(x, _1, _2, ...) _2
+#define EXT_CREATE_DEFAULT_SUBOBJECT_1_ARGS(Target) \
+	EXT_CREATE_DEFAULT_SUBOBJECT_2_ARGS(Target, TEXT(#Target))
+#define EXT_CREATE_DEFAULT_SUBOBJECT__MACRO_SELECTOR(x, _1, _2, ...) _2
 /**
  * @brief Wrapper macro of @c UObject::CreateDefaultSubobject .
  * @note Must be called inside a UObject constructor where @c this is valid.
@@ -104,11 +104,12 @@ namespace Ext
  *                    If omitted, the variable name of @p Target is used as the FName.
  * @code 
  *   // 1-arg form — uses the variable name "MeshComp" as the subobject FName.
- *   EXT_CREATE_SUBOBJECT(MeshComp);
+ *   EXT_CREATE_DEFAULT_SUBOBJECT(MeshComp);
  *   // 2-arg form — uses a custom FName for the subobject.
- *   EXT_CREATE_SUBOBJECT(MeshComp, TEXT("MyCustomName"));
+ *   EXT_CREATE_DEFAULT_SUBOBJECT(MeshComp, TEXT("MyCustomName"));
  * @endcode
  */
-#define EXT_CREATE_SUBOBJECT(...) \
-	EXT_CREATE_SUBOBJECT__MACRO_SELECTOR(__VA_ARGS__, \
-	EXT_CREATE_SUBOBJECT_2_ARGS, EXT_CREATE_SUBOBJECT_1_ARGS)(__VA_ARGS__)
+#define EXT_CREATE_DEFAULT_SUBOBJECT(...) \
+	EXT_CREATE_DEFAULT_SUBOBJECT__MACRO_SELECTOR(__VA_ARGS__, \
+	EXT_CREATE_DEFAULT_SUBOBJECT_2_ARGS, \
+	EXT_CREATE_DEFAULT_SUBOBJECT_1_ARGS)(__VA_ARGS__)

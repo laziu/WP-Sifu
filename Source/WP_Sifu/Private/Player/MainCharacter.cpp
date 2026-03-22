@@ -24,9 +24,9 @@ AMainCharacter::AMainCharacter()
 	}
 
 	// Set ability system
-	EXT_CREATE_SUBOBJECT(AbilitySystemComp, TEXT("AbilitySystemComponent"));
-	EXT_CREATE_SUBOBJECT(HealthAttribs, TEXT("HealthAttributes"));
-	EXT_CREATE_SUBOBJECT(CombatComp, TEXT("CombatComponent"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(AbilitySystemComp, TEXT("AbilitySystemComponent"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(HealthAttribs, TEXT("HealthAttributes"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(CombatComp, TEXT("CombatComponent"));
 
 	HealthAttribs->InitHealth(MaxHealth);
 	HealthAttribs->InitMaxHealth(MaxHealth);
