@@ -4,9 +4,14 @@
 #include "MainCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "PlayerInputComponent.h"
+#include "ThirdPersonCameraComponent.h"
+#include "CameraFocusComponent.h"
 #include "HealthAttributeSet.h"
 #include "PlayerCombatComponent.h"
 #include "UserExtension.h"
+#include "EnhancedInputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 // Sets default values
@@ -22,6 +27,22 @@ AMainCharacter::AMainCharacter()
 		GetMesh()->SetSkeletalMesh(TempMesh);
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0., 0., -88.), FRotator(0., 0., -90.));
 	}
+
+	// Third-person camera & input components
+	EXT_CREATE_DEFAULT_SUBOBJECT(PlayerInputComp, TEXT("PlayerInput"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(ThirdPersonCameraComp, TEXT("ThirdPersonCamera"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(LockOnComp, TEXT("LockOn"));
+
+	// Character rotation: don't use controller yaw, orient to movement direction
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->RotationRate = FRotator(0., 540., 0.);
+	GetCharacterMovement()->JumpZVelocity = 600.;
+	GetCharacterMovement()->AirControl = 0.2;
+	GetCharacterMovement()->MaxWalkSpeed = 500.;
 
 	// Set ability system
 	EXT_CREATE_DEFAULT_SUBOBJECT(AbilitySystemComp, TEXT("AbilitySystemComponent"));
@@ -53,6 +74,14 @@ void AMainCharacter::Tick(float DeltaTime)
 void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if (auto EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		if (PlayerInputComp)
+		{
+			PlayerInputComp->SetupInputBindings(EnhancedInput);
+		}
+	}
 }
 
 UAbilitySystemComponent* AMainCharacter::GetAbilitySystemComponent() const

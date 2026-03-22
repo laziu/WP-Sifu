@@ -35,6 +35,15 @@ public:
 	virtual UCombatComponentBase* GetCombatComponent() const override;
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input)
+	TObjectPtr<class UPlayerInputComponent> PlayerInputComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	TObjectPtr<class UThirdPersonCameraComponent> ThirdPersonCameraComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
+	TObjectPtr<class UCameraFocusComponent> LockOnComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Abilities)
 	TObjectPtr<class UAbilitySystemComponent> AbilitySystemComp;
 
