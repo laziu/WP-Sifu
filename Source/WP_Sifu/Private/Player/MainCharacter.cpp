@@ -25,7 +25,7 @@ AMainCharacter::AMainCharacter()
 		"/Script/Engine.SkeletalMesh'/Game/ART_FROM_SIFU/Player/SK_M_MainChar_01/SkeletalMeshes/SK_M_MainChar_01.SK_M_MainChar_01'")))
 	{
 		GetMesh()->SetSkeletalMesh(TempMesh);
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0., 0., -88.), FRotator(0., 0., -90.));
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0., 0., -88.), FRotator(0., -90., 0.));
 
 		if (auto TempAnim = Ext::OpenObject<UAnimInstance>(
 			TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Anims/ABP_MainCharacter.ABP_MainCharacter_C'")))
