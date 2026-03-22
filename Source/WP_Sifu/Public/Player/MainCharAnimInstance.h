@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "PlayerAnimInstance.generated.h"
+#include "MainCharAnimInstance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WP_SIFU_API UPlayerAnimInstance : public UAnimInstance
+class WP_SIFU_API UMainCharAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 

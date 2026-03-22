@@ -1,13 +1,13 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PlayerAnimInstance.h"
+#include "MainCharAnimInstance.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "KismetAnimationLibrary.h"
 
-void UPlayerAnimInstance::NativeInitializeAnimation()
+void UMainCharAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
@@ -18,7 +18,7 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 	}
 }
 
-void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+void UMainCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	if (!IsValid(Character)) return;

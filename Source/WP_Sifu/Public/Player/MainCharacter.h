@@ -6,16 +6,16 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "Attackable.h"
-#include "PlayerCharacter.generated.h"
+#include "MainCharacter.generated.h"
 
 UCLASS()
-class WP_SIFU_API APlayerCharacter : public ACharacter, public IAbilitySystemInterface, public IAttackable
+class WP_SIFU_API AMainCharacter : public ACharacter, public IAbilitySystemInterface, public IAttackable
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	APlayerCharacter();
+	AMainCharacter();
 
 protected:
 	// Called when the game starts or when spawned
