@@ -26,6 +26,13 @@ AMainCharacter::AMainCharacter()
 	{
 		GetMesh()->SetSkeletalMesh(TempMesh);
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0., 0., -88.), FRotator(0., 0., -90.));
+
+		if (auto TempAnim = Ext::OpenObject<UAnimInstance>(
+			TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Anims/ABP_MainCharacter.ABP_MainCharacter_C'")))
+		{
+			GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+			GetMesh()->SetAnimInstanceClass(TempAnim->GetClass());
+		}
 	}
 
 	// Third-person camera & input components
