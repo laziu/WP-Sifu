@@ -85,6 +85,13 @@ namespace Ext
 		{
 			Target = Owner->CreateDefaultSubobject<T>(ObjectName);
 		}
+
+		// NewObject helper function
+		template <class T>
+		void NewObject(TObjectPtr<T>& Target, FName ObjectName) const
+		{
+			Target = NewObject<T>(Owner, ObjectName);
+		}
 	};
 }
 
@@ -103,9 +110,7 @@ namespace Ext
  * @param ObjectName  (Optional) The FName used to identify the subobject.
  *                    If omitted, the variable name of @p Target is used as the FName.
  * @code 
- *   // 1-arg form — uses the variable name "MeshComp" as the subobject FName.
  *   EXT_CREATE_DEFAULT_SUBOBJECT(MeshComp);
- *   // 2-arg form — uses a custom FName for the subobject.
  *   EXT_CREATE_DEFAULT_SUBOBJECT(MeshComp, TEXT("MyCustomName"));
  * @endcode
  */
@@ -113,3 +118,34 @@ namespace Ext
 	EXT_CREATE_DEFAULT_SUBOBJECT__MACRO_SELECTOR(__VA_ARGS__, \
 	EXT_CREATE_DEFAULT_SUBOBJECT_2_ARGS, \
 	EXT_CREATE_DEFAULT_SUBOBJECT_1_ARGS)(__VA_ARGS__)
+
+
+#define EXT_NEW_OBJECT_3_ARGS(Target, Owner, ObjectName) \
+{ \
+	Ext::Bind(Owner).NewObject(Target, ObjectName); \
+}
+#define EXT_NEW_OBJECT_2_ARGS(Target, Owner) \
+	EXT_NEW_OBJECT_3_ARGS(Target, Owner, TEXT(#Target))
+#define EXT_NEW_OBJECT_1_ARGS(Target) \
+	EXT_NEW_OBJECT_2_ARGS(Target, this)
+#define EXT_NEW_OBJECT__MACRO_SELECTOR(x, _1, _2, _3, ...) _3
+/**
+ * @brief Wrapper macro of @c NewObject .
+ * @note Must be called where @c this is valid, and @p Owner must be a valid UObject pointer.
+ * @param Target      The TObjectPtr variable to receive the created object.
+ *                    Its template type is used to deduce the object class.
+ * @param Owner       (Optional) The UObject that will own the created object.
+ *                    If omitted, @c this is used as the owner.
+ * @param ObjectName  (Optional) The FName used to identify the created object.
+ *                    If omitted, the variable name of @p Target is used as the FName.
+ * @code 
+ *   EXT_NEW_OBJECT(MyObject);
+ *   EXT_NEW_OBJECT(MyObject, Owner);
+ *   EXT_NEW_OBJECT(MyObject, Owner, TEXT("MyCustomName"));
+ * @endcode
+ */
+#define EXT_NEW_OBJECT(...) \
+	EXT_NEW_OBJECT__MACRO_SELECTOR(__VA_ARGS__, \
+	EXT_NEW_OBJECT_3_ARGS, \
+	EXT_NEW_OBJECT_2_ARGS, \
+	EXT_NEW_OBJECT_1_ARGS)(__VA_ARGS__)
