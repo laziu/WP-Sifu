@@ -30,7 +30,7 @@ public:
 
 	/// Distance from the character
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Camera)
-	double TargetArmLength = 350.;
+	double TargetArmLength = 120.;
 
 	/// Socket offset for over-the-shoulder view
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Camera)
