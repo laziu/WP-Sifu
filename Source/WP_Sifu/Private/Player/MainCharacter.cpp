@@ -49,7 +49,6 @@ AMainCharacter::AMainCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0., 540., 0.);
 	GetCharacterMovement()->JumpZVelocity = 600.;
 	GetCharacterMovement()->AirControl = 0.2;
-	GetCharacterMovement()->MaxWalkSpeed = 500.;
 
 	// Set ability system
 	EXT_CREATE_DEFAULT_SUBOBJECT(AbilitySystemComp, TEXT("AbilitySystemComponent"));

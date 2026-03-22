@@ -19,6 +19,10 @@ class WP_SIFU_API UPlayerInputComponent : public UActorComponent
 public:
 	UPlayerInputComponent();
 
+protected:
+	virtual void BeginPlay() override;
+
+public:
 	/// Bind all input actions to the given EnhancedInputComponent
 	void SetupInputBindings(class UEnhancedInputComponent* EnhancedInputComponent);
 
@@ -31,7 +35,23 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
 	TObjectPtr<class UInputAction> InputLook;
 
+	/// Run input action (Shift)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
+	TObjectPtr<class UInputAction> InputRun;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character|Movement")
+	double WalkSpeed = 200.;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character|Movement")
+	double RunSpeed = 400.;
+
 private:
 	void OnInputMove(const struct FInputActionValue& Value);
 	void OnInputLook(const struct FInputActionValue& Value);
+	void OnInputRunStarted();
+	void OnInputRunStopped();
+
+private:
+	/// Set move speed
+	void SetOwnerWalkSpeed(double NewSpeed) const;
 };
