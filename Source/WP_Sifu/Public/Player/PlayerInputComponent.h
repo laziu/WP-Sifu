@@ -40,10 +40,10 @@ protected:
 	TObjectPtr<class UInputAction> InputRun;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character|Movement")
-	double WalkSpeed = 200.;
+	double WalkSpeed = 150.;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character|Movement")
-	double RunSpeed = 400.;
+	double RunSpeed = 300.;
 
 private:
 	void OnInputMove(const struct FInputActionValue& Value);
