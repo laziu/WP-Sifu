@@ -1,0 +1,16 @@
+ID,GameplayTag,Comment
+Neutral,Player.CombatState.Neutral,Neutral state
+Parry,Player.CombatState.Parry,Just after parry
+Block,Player.CombatState.Block,Blocking
+DodgeUp,Player.CombatState.Dodge.Up,Dodge Up
+DodgeDown,Player.CombatState.Dodge.Down,Dodge Down
+Run,Player.CombatState.Run,Running
+L1,Player.CombatState.L,Light Attack Combo 1
+L2,Player.CombatState.L.L,Light Attack Combo 2
+L3,Player.CombatState.L.L.L,Light Attack Combo 3
+L4,Player.CombatState.L.L.L.L,Light Attack Combo 4
+L5,Player.CombatState.L.L.L.L.L,Light Attack Combo 5
+H1,Player.CombatState.H,Heavy Attack Combo 1
+H2,Player.CombatState.H.H,Heavy Attack Combo 2
+H3,Player.CombatState.H.H.H,Heavy Attack Combo 3
+H4,Player.CombatState.H.H.H.H,Heavy Attack Combo 4
