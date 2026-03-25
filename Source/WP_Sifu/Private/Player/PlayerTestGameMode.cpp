@@ -2,3 +2,12 @@
 
 
 #include "PlayerTestGameMode.h"
+
+#include "MainCharacter.h"
+#include "MainCharPlayerController.h"
+
+APlayerTestGameMode::APlayerTestGameMode()
+{
+	DefaultPawnClass = AMainCharacter::StaticClass();
+	PlayerControllerClass = AMainCharPlayerController::StaticClass();
+}

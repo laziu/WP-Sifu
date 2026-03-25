@@ -13,4 +13,7 @@ UCLASS()
 class WP_SIFU_API APlayerTestGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
+
+public:
+	APlayerTestGameMode();
 };

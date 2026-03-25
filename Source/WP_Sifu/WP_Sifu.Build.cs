@@ -10,7 +10,8 @@ public class WP_Sifu : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
-			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Niagara",
+			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
+			"AnimGraph", "AnimGraphRuntime", "Niagara",
 			"UMG", "Slate", "SlateCore",
 			"AIModule", "StateTreeModule", "GameplayStateTreeModule",
 			"GameplayAbilities", "GameplayTags", "GameplayTasks",
@@ -23,6 +24,8 @@ public class WP_Sifu : ModuleRules
 			"WP_Sifu/Public",
 			"WP_Sifu/Public/Interface",
 			"WP_Sifu/Public/Player",
+			"WP_Sifu/Public/Data",
+			"WP_Sifu/Public/Animation",
 		});
 	}
 }
