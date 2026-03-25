@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "GameplayTagContainer.h"
 #include "MainCharAnimInstance.generated.h"
 
 /**
@@ -45,4 +46,12 @@ protected:
 	// Movement component falling state
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	bool bIsFalling;
+
+	// --- Combat ---
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat")
+	FGameplayTag CurrentCombatStateTag;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat")
+	bool bIsAttacking = false;
 };

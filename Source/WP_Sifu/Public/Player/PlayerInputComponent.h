@@ -39,6 +39,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
 	TObjectPtr<class UInputAction> InputRun;
 
+	/// Light Attack input action
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
+	TObjectPtr<class UInputAction> InputLightAttack;
+
+	/// Heavy Attack input action
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
+	TObjectPtr<class UInputAction> InputHeavyAttack;
+
+	/// Block input action
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
+	TObjectPtr<class UInputAction> InputBlock;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character|Movement")
 	double WalkSpeed = 150.;
 
@@ -50,6 +62,10 @@ private:
 	void OnInputLook(const struct FInputActionValue& Value);
 	void OnInputRunStarted();
 	void OnInputRunStopped();
+	void OnInputLightAttack();
+	void OnInputHeavyAttack();
+	void OnInputBlockStarted();
+	void OnInputBlockStopped();
 
 private:
 	/// Set move speed

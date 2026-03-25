@@ -9,6 +9,7 @@
 #include "CameraFocusComponent.h"
 #include "HealthAttributeSet.h"
 #include "PlayerCombatComponent.h"
+#include "PlayerComboComponent.h"
 #include "UserExtension.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -27,8 +28,8 @@ AMainCharacter::AMainCharacter()
 		GetMesh()->SetSkeletalMesh(TempMesh);
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0., 0., -88.), FRotator(0., -90., 0.));
 
-		if (auto TempAnim = Ext::OpenObject<UAnimInstance>(
-			TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Anims/ABP_MainCharacter.ABP_MainCharacter_C'")))
+		if (auto TempAnim = Ext::OpenObject<UAnimBlueprint>(
+			TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Anims/ABP_MainCharacter.ABP_MainCharacter'")))
 		{
 			GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 			GetMesh()->SetAnimInstanceClass(TempAnim->GetClass());
@@ -54,6 +55,7 @@ AMainCharacter::AMainCharacter()
 	EXT_CREATE_DEFAULT_SUBOBJECT(AbilitySystemComp, TEXT("AbilitySystemComponent"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(HealthAttribs, TEXT("HealthAttributes"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(CombatComp, TEXT("CombatComponent"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(ComboComp, TEXT("ComboComponent"));
 
 	HealthAttribs->InitHealth(MaxHealth);
 	HealthAttribs->InitMaxHealth(MaxHealth);

@@ -22,4 +22,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
 	TObjectPtr<class UInputMappingContext> InputMappingDefault;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
+	TObjectPtr<class UInputMappingContext> InputMappingCombat;
 };

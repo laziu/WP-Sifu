@@ -15,6 +15,10 @@ class WP_SIFU_API UPlayerCombatComponent : public UCombatComponentBase
 public:
 	UPlayerCombatComponent();
 
+	// Block 키 입력 처리
+	void StartBlock();
+	void StopBlock();
+
 protected:
 	// Called when the component is initialized
 	virtual void InitializeComponent() override;
@@ -27,8 +31,19 @@ private:
 	bool IsAttackFromBehind(const FVector& ImpactLocation) const;
 
 	// Dodging/Parrying 시 Structure 데미지에 곱해지는 비율 (임시)
-	static constexpr float DeflectStructureRate = 0.25f;
+	static constexpr float DeflectStructureRate = -2.f;
 
 	UPROPERTY()
 	TObjectPtr<class UAbilitySystemComponent> AbilitySystemComp;
+
+	// --- Parry/Block ---
+
+	FTimerHandle ParryTimerHandle;
+
+	UPROPERTY(EditDefaultsOnly, Category=Combat)
+	float ParryWindowDuration = 0.15f;
+
+	bool bBlockKeyHeld = false;
+
+	void OnParryWindowExpired();
 };

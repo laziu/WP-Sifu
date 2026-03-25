@@ -5,6 +5,8 @@
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "UserExtension.h"
+#include "PlayerComboComponent.h"
+#include "PlayerCombatComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -16,6 +18,9 @@ UPlayerInputComponent::UPlayerInputComponent()
 	Ext::SetObject(InputMove, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Move.IA_Move'"));
 	Ext::SetObject(InputLook, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Look.IA_Look'"));
 	Ext::SetObject(InputRun, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Run.IA_Run'"));
+	Ext::SetObject(InputLightAttack, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_LightAttack.IA_LightAttack'"));
+	Ext::SetObject(InputHeavyAttack, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_HeavyAttack.IA_HeavyAttack'"));
+	Ext::SetObject(InputBlock, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Block.IA_Block'"));
 }
 
 void UPlayerInputComponent::BeginPlay()
@@ -37,6 +42,14 @@ void UPlayerInputComponent::SetupInputBindings(UEnhancedInputComponent* Enhanced
 		InputRun, ETriggerEvent::Completed, this, &UPlayerInputComponent::OnInputRunStopped);
 	EnhancedInputComponent->BindAction(
 		InputRun, ETriggerEvent::Canceled, this, &UPlayerInputComponent::OnInputRunStopped);
+	EnhancedInputComponent->BindAction(
+		InputLightAttack, ETriggerEvent::Started, this, &UPlayerInputComponent::OnInputLightAttack);
+	EnhancedInputComponent->BindAction(
+		InputHeavyAttack, ETriggerEvent::Started, this, &UPlayerInputComponent::OnInputHeavyAttack);
+	EnhancedInputComponent->BindAction(
+		InputBlock, ETriggerEvent::Started, this, &UPlayerInputComponent::OnInputBlockStarted);
+	EnhancedInputComponent->BindAction(
+		InputBlock, ETriggerEvent::Completed, this, &UPlayerInputComponent::OnInputBlockStopped);
 }
 
 void UPlayerInputComponent::OnInputMove(const FInputActionValue& Value)
@@ -63,11 +76,39 @@ void UPlayerInputComponent::OnInputLook(const FInputActionValue& Value)
 void UPlayerInputComponent::OnInputRunStarted()
 {
 	SetOwnerWalkSpeed(RunSpeed);
+	if (auto* Combo = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
+		Combo->SetCombatState(FGameplayTag::RequestGameplayTag(TEXT("CombatState.Run")));
 }
 
 void UPlayerInputComponent::OnInputRunStopped()
 {
 	SetOwnerWalkSpeed(WalkSpeed);
+	if (auto* Combo = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
+		Combo->SetCombatState(FGameplayTag::RequestGameplayTag(TEXT("CombatState.Neutral")));
+}
+
+void UPlayerInputComponent::OnInputLightAttack()
+{
+	if (auto* Combo = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
+		Combo->InputAction(FGameplayTag::RequestGameplayTag(TEXT("AttackAction.Light")));
+}
+
+void UPlayerInputComponent::OnInputHeavyAttack()
+{
+	if (auto* Combo = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
+		Combo->InputAction(FGameplayTag::RequestGameplayTag(TEXT("AttackAction.Heavy")));
+}
+
+void UPlayerInputComponent::OnInputBlockStarted()
+{
+	if (auto* Combat = GetOwner()->FindComponentByClass<UPlayerCombatComponent>())
+		Combat->StartBlock();
+}
+
+void UPlayerInputComponent::OnInputBlockStopped()
+{
+	if (auto* Combat = GetOwner()->FindComponentByClass<UPlayerCombatComponent>())
+		Combat->StopBlock();
 }
 
 void UPlayerInputComponent::SetOwnerWalkSpeed(double NewSpeed) const

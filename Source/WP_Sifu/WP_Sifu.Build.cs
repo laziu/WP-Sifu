@@ -24,6 +24,8 @@ public class WP_Sifu : ModuleRules
 			"WP_Sifu/Public",
 			"WP_Sifu/Public/Interface",
 			"WP_Sifu/Public/Player",
+			"WP_Sifu/Public/Data",
+			"WP_Sifu/Public/Animation",
 		});
 	}
 }

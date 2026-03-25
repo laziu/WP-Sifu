@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "HealthAttributeSet.h"
+#include "PlayerComboComponent.h"
 
 
 UPlayerCombatComponent::UPlayerCombatComponent()
@@ -61,6 +62,15 @@ EAttackResponse UPlayerCombatComponent::ApplyDamage(const FAttackPayload& Payloa
 		}
 
 	case EDefenceState::Dodging:
+		{
+			// no health damage, reduce structure
+			AbilitySystemComp->ApplyModToAttribute(
+				UHealthAttributeSet::GetStructureAttribute(),
+				EGameplayModOp::Additive, Payload.StructureDamage * DeflectStructureRate);
+
+			return EAttackResponse::Dodge;
+		}
+
 	case EDefenceState::Parrying:
 		{
 			// no health damage, reduce structure
@@ -68,9 +78,25 @@ EAttackResponse UPlayerCombatComponent::ApplyDamage(const FAttackPayload& Payloa
 				UHealthAttributeSet::GetStructureAttribute(),
 				EGameplayModOp::Additive, Payload.StructureDamage * DeflectStructureRate);
 
-			return DefenceState == EDefenceState::Parrying
-				       ? EAttackResponse::Parry
-				       : EAttackResponse::Dodge;
+			// 적에게 Structure 데미지 반사
+			if (Payload.Instigator.IsValid())
+			{
+				FAttackPayload ReflectPayload;
+				ReflectPayload.StructureDamage = Payload.StructureDamage;
+				ReflectPayload.HealthDamage = 0.f;
+				ReflectPayload.Instigator = GetOwner();
+				ReflectPayload.bUnblockable = true;
+				SendAttack(Payload.Instigator.Get(), ReflectPayload);
+			}
+
+			// Parry 성공 → 콤보 컴포넌트에 알림
+			if (auto* ComboComp = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
+			{
+				ComboComp->SetCombatState(
+					FGameplayTag::RequestGameplayTag(TEXT("CombatState.Parry")));
+			}
+
+			return EAttackResponse::Parry;
 		}
 
 	case EDefenceState::Invincible:
@@ -94,3 +120,29 @@ bool UPlayerCombatComponent::IsAttackFromBehind(const FVector& ImpactLocation) c
 	// Dot product < 0 means the attack comes from behind (angle > 90 degrees)
 	return FVector::DotProduct(Forward, ToImpact) < 0.f;
 }
+
+void UPlayerCombatComponent::StartBlock()
+{
+	bBlockKeyHeld = true;
+	SetDefenceState(EDefenceState::Parrying);
+	GetWorld()->GetTimerManager().SetTimer(
+		ParryTimerHandle, this,
+		&UPlayerCombatComponent::OnParryWindowExpired,
+		ParryWindowDuration, false);
+}
+
+void UPlayerCombatComponent::StopBlock()
+{
+	bBlockKeyHeld = false;
+	GetWorld()->GetTimerManager().ClearTimer(ParryTimerHandle);
+	SetDefenceState(EDefenceState::None);
+}
+
+void UPlayerCombatComponent::OnParryWindowExpired()
+{
+	if (bBlockKeyHeld)
+		SetDefenceState(EDefenceState::Blocking);
+	else
+		SetDefenceState(EDefenceState::None);
+}
+

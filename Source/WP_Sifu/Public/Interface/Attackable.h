@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "GameplayTagContainer.h"
 #include "Attackable.generated.h"
 
 
@@ -63,6 +64,10 @@ struct FAttackPayload
 	// Whether this is a special attack (takedown, focus, etc. - always hits, cannot be blocked)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Attack)
 	bool bUnblockable = false;
+
+	// HitReaction tag (HitReaction.Stun, HitReaction.Down, etc.)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Attack)
+	FGameplayTag HitReaction;
 };
 
 

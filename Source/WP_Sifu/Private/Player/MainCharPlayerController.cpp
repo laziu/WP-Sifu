@@ -13,6 +13,8 @@ AMainCharPlayerController::AMainCharPlayerController()
 
 	Ext::SetObject(InputMappingDefault,
 	               TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Default.IMC_Default'"));
+	Ext::SetObject(InputMappingCombat,
+	               TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Combat.IMC_Combat'"));
 }
 
 void AMainCharPlayerController::BeginPlay()
@@ -24,6 +26,10 @@ void AMainCharPlayerController::BeginPlay()
 		if (InputMappingDefault)
 		{
 			Subsystem->AddMappingContext(InputMappingDefault, 0);
+		}
+		if (InputMappingCombat)
+		{
+			Subsystem->AddMappingContext(InputMappingCombat, 0);
 		}
 	}
 }
