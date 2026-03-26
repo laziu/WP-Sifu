@@ -14,7 +14,8 @@ public class WP_Sifu : ModuleRules
 			"AnimGraph", "AnimGraphRuntime", "Niagara",
 			"UMG", "Slate", "SlateCore",
 			"AIModule", "StateTreeModule", "GameplayStateTreeModule",
-			"GameplayAbilities", "GameplayTags", "GameplayTasks", "NavigationSystem"
+			"GameplayAbilities", "GameplayTags", "GameplayTasks", "NavigationSystem",
+			"GameplayTagIndexer"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
