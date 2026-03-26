@@ -80,11 +80,6 @@ private:
 	FTimerHandle ParryResetTimerHandle;
 	static constexpr float ParryStateDuration = 1.0f;
 
-	// Cache
-	FGameplayTag NeutralTag;
-	FGameplayTag RunTag;
-	FGameplayTag ParryTag;
-
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 	void BuildTransitionLookup();
 	void BuildDamageLookup();
