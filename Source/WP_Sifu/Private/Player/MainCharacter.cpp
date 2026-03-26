@@ -28,11 +28,11 @@ AMainCharacter::AMainCharacter()
 		GetMesh()->SetSkeletalMesh(TempMesh);
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0., 0., -88.), FRotator(0., -90., 0.));
 
-		if (auto TempAnim = Ext::OpenObject<UAnimBlueprint>(
-			TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Anims/ABP_MainCharacter.ABP_MainCharacter'")))
+		if (auto TempAnim = Ext::OpenClass<UAnimInstance>(
+			TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Anims/ABP_MainCharacter.ABP_MainCharacter_C'")))
 		{
 			GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-			GetMesh()->SetAnimInstanceClass(TempAnim->GetClass());
+			GetMesh()->SetAnimInstanceClass(TempAnim);
 		}
 	}
 

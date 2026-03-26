@@ -42,6 +42,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category=Combat)
 	void SwitchTarget(bool bToRight);
 
+	/// The direction the character should face.
+	/// If locked on, it's the direction to the target; otherwise, it's the character's forward vector.
+	UFUNCTION(BlueprintPure, Category=Camera)
+	FVector GetFacingDirection() const;
+
 protected:
 	virtual void BeginPlay() override;
 
