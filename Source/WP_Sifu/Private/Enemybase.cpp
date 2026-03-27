@@ -26,7 +26,7 @@ AEnemybase::AEnemybase()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	
-	GetMesh()->SetCollisionProfileName("")
+	//GetMesh()->SetCollisionProfileName("")
 }
 
 // Called when the game starts or when spawned
