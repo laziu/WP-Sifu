@@ -64,6 +64,9 @@ void UPlayerAttackComponent::BeginPlay()
 
 	CurrentStateTag = GameplayTag::Combat_State_Neutral;
 
+	// Backup the default table configured in the editor
+	DefaultAttackDefinitionTable = AttackDefinitionTable;
+
 	BuildTransitionLookup();
 	BuildAttackDefinitionLookup();
 	PreloadMontages();
@@ -259,4 +262,11 @@ void UPlayerAttackComponent::OpenTransitionWindow(FGameplayTag InputTag)
 void UPlayerAttackComponent::CloseTransitionWindow(FGameplayTag InputTag)
 {
 	OpenTransitionWindows.Remove(InputTag);
+}
+
+void UPlayerAttackComponent::SetAttackTable(UDataTable* NewTable)
+{
+	AttackDefinitionTable = NewTable;
+	BuildAttackDefinitionLookup();
+	PreloadMontages();
 }

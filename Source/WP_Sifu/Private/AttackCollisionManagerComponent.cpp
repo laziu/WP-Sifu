@@ -1,0 +1,153 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "AttackCollisionManagerComponent.h"
+
+#include "AttackCollisionComponent.h"
+#include "CombatInteractionComponentBase.h"
+#include "PlayerAttackComponent.h"
+#include "Weapon/WeaponBase.h"
+#include "WP_Sifu.h"
+#include "GameFramework/Character.h"
+
+
+UAttackCollisionManagerComponent::UAttackCollisionManagerComponent()
+{
+	PrimaryComponentTick.bCanEverTick = false;
+}
+
+
+// ─────────────────────────────────────────────
+//  Lifecycle
+// ─────────────────────────────────────────────
+
+void UAttackCollisionManagerComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	AActor* Owner = GetOwner();
+	if (!Owner) return;
+
+	CombatComp = Owner->FindComponentByClass<UCombatInteractionComponentBase>();
+	AttackComp = Owner->FindComponentByClass<UPlayerAttackComponent>();
+
+	if (!CombatComp)
+	{
+		LOGW(TEXT("AttackCollisionManager: Owner에 CombatInteractionComponentBase가 없습니다."));
+	}
+	if (!AttackComp)
+	{
+		LOGW(TEXT("AttackCollisionManager: Owner에 PlayerAttackComponent가 없습니다."));
+	}
+}
+
+
+// ─────────────────────────────────────────────
+//  Registration
+// ─────────────────────────────────────────────
+
+void UAttackCollisionManagerComponent::RegisterPersistentCollision(UAttackCollisionComponent* Comp)
+{
+	if (!Comp) return;
+
+	const FGameplayTag Tag = Comp->GetAttackTag();
+	if (!Tag.IsValid())
+	{
+		LOGW(TEXT("RegisterPersistentCollision: AttackTag가 유효하지 않습니다."));
+		return;
+	}
+
+	ActiveCollisionMap.Add(Tag, Comp);
+
+	FDelegateHandle Handle = Comp->OnAttackHit.AddUObject(
+		this, &UAttackCollisionManagerComponent::HandleHit);
+	HitDelegateHandles.Add(Tag, Handle);
+}
+
+
+UAttackCollisionComponent* UAttackCollisionManagerComponent::FindAttackCollision(
+	const FGameplayTag& AttackTag) const
+{
+	if (const auto* Found = ActiveCollisionMap.Find(AttackTag))
+	{
+		return *Found;
+	}
+	return nullptr;
+}
+
+
+// ─────────────────────────────────────────────
+//  Weapon Equip / Unequip
+// ─────────────────────────────────────────────
+
+void UAttackCollisionManagerComponent::EquipWeapon(AWeaponBase* Weapon)
+{
+	if (!Weapon || !AttackComp) return;
+	if (EquippedWeapon) UnequipWeapon();
+
+	// Backup the current unarmed attack table
+	DefaultAttackTable = AttackComp->GetDefaultAttackTable();
+	AttackComp->SetAttackTable(Weapon->AttackDefinitionTable);
+
+	// Attach the weapon to the character
+	auto* Character = Cast<ACharacter>(GetOwner());
+	Weapon->OnEquipped(Character);
+
+	// Register the weapon collision component
+	UAttackCollisionComponent* WeaponCollision = Weapon->AttackCollision;
+	if (WeaponCollision)
+	{
+		const FGameplayTag Tag = WeaponCollision->GetAttackTag();
+		ActiveCollisionMap.Add(Tag, WeaponCollision);
+
+		FDelegateHandle Handle = WeaponCollision->OnAttackHit.AddUObject(
+			this, &UAttackCollisionManagerComponent::HandleHit);
+		HitDelegateHandles.Add(Tag, Handle);
+	}
+
+	EquippedWeapon = Weapon;
+}
+
+void UAttackCollisionManagerComponent::UnequipWeapon()
+{
+	if (!EquippedWeapon) return;
+
+	// Restore the unarmed attack table
+	if (AttackComp && DefaultAttackTable)
+	{
+		AttackComp->SetAttackTable(DefaultAttackTable);
+	}
+	DefaultAttackTable = nullptr;
+
+	// Unregister the weapon collision component
+	UAttackCollisionComponent* WeaponCollision = EquippedWeapon->AttackCollision;
+	if (WeaponCollision)
+	{
+		const FGameplayTag Tag = WeaponCollision->GetAttackTag();
+
+		if (const auto* HandlePtr = HitDelegateHandles.Find(Tag))
+		{
+			WeaponCollision->OnAttackHit.Remove(*HandlePtr);
+			HitDelegateHandles.Remove(Tag);
+		}
+		ActiveCollisionMap.Remove(Tag);
+	}
+
+	EquippedWeapon->OnUnequipped();
+	EquippedWeapon = nullptr;
+}
+
+
+// ─────────────────────────────────────────────
+//  Hit Handling
+// ─────────────────────────────────────────────
+
+void UAttackCollisionManagerComponent::HandleHit(AActor* HitActor, const FHitResult& HitResult)
+{
+	if (!HitActor || !AttackComp || !CombatComp) return;
+
+	FAttackPayload Payload = AttackComp->MakeCurrentAttackPayload();
+	Payload.ImpactLocation = HitResult.ImpactPoint;
+
+	CombatComp->SendAttack(HitActor, Payload);
+}

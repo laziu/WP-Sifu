@@ -53,6 +53,23 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
 	TObjectPtr<class UPlayerAttackComponent> AttackComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
+	TObjectPtr<class UAttackCollisionManagerComponent> AttackCollisionManagerComp;
+
+	// --- Unarmed Collision Components (attached to sockets) ---
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
+	TObjectPtr<class UAttackCollisionComponent> HandCollisionLeft;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
+	TObjectPtr<class UAttackCollisionComponent> HandCollisionRight;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
+	TObjectPtr<class UAttackCollisionComponent> FootCollisionLeft;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
+	TObjectPtr<class UAttackCollisionComponent> FootCollisionRight;
+
 	UPROPERTY()
 	TObjectPtr<class UHealthAttributeSet> HealthAttribs;
 

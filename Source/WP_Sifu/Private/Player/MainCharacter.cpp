@@ -11,6 +11,8 @@
 #include "HealthAttributeSet.h"
 #include "PlayerAttackComponent.h"
 #include "PlayerCombatInteractionComponent.h"
+#include "AttackCollisionComponent.h"
+#include "AttackCollisionManagerComponent.h"
 #include "UserExtension.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -47,6 +49,24 @@ AMainCharacter::AMainCharacter()
 	EXT_CREATE_DEFAULT_SUBOBJECT(HealthAttribs, TEXT("HealthAttributes"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(CombatInteractionComp, TEXT("CombatInteractionComponent"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(AttackComp, TEXT("AttackComponent"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(AttackCollisionManagerComp, TEXT("AttackCollisionManager"));
+
+	// Unarmed hand/foot collision components (attached to skeletal mesh sockets)
+	EXT_CREATE_DEFAULT_SUBOBJECT(HandCollisionLeft, TEXT("HandCollisionLeft"));
+	HandCollisionLeft->SetupAttachment(GetMesh(), TEXT("HandL"));
+	HandCollisionLeft->AttackTag = FGameplayTag::RequestGameplayTag(TEXT("Attack.Source.Hand.L"));
+
+	EXT_CREATE_DEFAULT_SUBOBJECT(HandCollisionRight, TEXT("HandCollisionRight"));
+	HandCollisionRight->SetupAttachment(GetMesh(), TEXT("HandR"));
+	HandCollisionRight->AttackTag = FGameplayTag::RequestGameplayTag(TEXT("Attack.Source.Hand.R"));
+
+	EXT_CREATE_DEFAULT_SUBOBJECT(FootCollisionLeft, TEXT("FootCollisionLeft"));
+	FootCollisionLeft->SetupAttachment(GetMesh(), TEXT("FootL"));
+	FootCollisionLeft->AttackTag = FGameplayTag::RequestGameplayTag(TEXT("Attack.Source.Foot.L"));
+
+	EXT_CREATE_DEFAULT_SUBOBJECT(FootCollisionRight, TEXT("FootCollisionRight"));
+	FootCollisionRight->SetupAttachment(GetMesh(), TEXT("FootR"));
+	FootCollisionRight->AttackTag = FGameplayTag::RequestGameplayTag(TEXT("Attack.Source.Foot.R"));
 
 	HealthAttribs->InitHealth(MaxHealth);
 	HealthAttribs->InitMaxHealth(MaxHealth);
@@ -61,6 +81,12 @@ void AMainCharacter::BeginPlay()
 
 	// Setup owner for ability system component
 	AbilitySystemComp->InitAbilityActorInfo(this, this);
+
+	// Register the unarmed collision components
+	AttackCollisionManagerComp->RegisterPersistentCollision(HandCollisionLeft);
+	AttackCollisionManagerComp->RegisterPersistentCollision(HandCollisionRight);
+	AttackCollisionManagerComp->RegisterPersistentCollision(FootCollisionLeft);
+	AttackCollisionManagerComp->RegisterPersistentCollision(FootCollisionRight);
 }
 
 // Called every frame
