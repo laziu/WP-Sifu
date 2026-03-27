@@ -31,7 +31,7 @@ enum class EDefenceState : uint8
 /**
  * Player/Enemy common combat component.
  */
-UCLASS(ClassGroup=(Combat), meta=(BlueprintSpawnableComponent))
+UCLASS(ClassGroup=(Combat), meta=(BlueprintSpawnableComponent), Blueprintable)
 class WP_SIFU_API UCombatComponentBase : public UActorComponent
 {
 	GENERATED_BODY()
