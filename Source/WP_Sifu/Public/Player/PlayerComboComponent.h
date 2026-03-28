@@ -55,9 +55,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Combo)
 	TObjectPtr<UDataTable> AttackDamageTable;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Combo)
-	TObjectPtr<UAnimMontage> ComboMontage;
-
 private:
 	FGameplayTag CurrentStateTag;
 	TSet<FName> OpenTransitionWindows;
@@ -74,18 +71,21 @@ private:
 	// AttackDamage lookup: StateTag → Row*
 	TMap<FGameplayTag, const struct FPlayerAttackDamageRow*> DamageLookup;
 
+	// Preloaded montages: StateTag → Montage (populated at BeginPlay)
+	TMap<FGameplayTag, TObjectPtr<class UAnimMontage>> MontageCache;
+
+	// Currently playing montage (nullptr when not attacking)
+	TObjectPtr<class UAnimMontage> ActiveMontage;
+
 	TOptional<FGameplayTag> BufferedActionTag;
 
 	// Parry -> Neutral Timer
 	FTimerHandle ParryResetTimerHandle;
 	static constexpr float ParryStateDuration = 1.0f;
 
-	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+	void OnMontageEnded(class UAnimMontage* Montage, bool bInterrupted);
 	void BuildTransitionLookup();
 	void BuildDamageLookup();
+	void PreloadMontages();
 	void ExecuteTransition(const FTransitionEntry& Entry);
-
-	// Export montage section name from StateTag
-	// e.g. "CombatState.L1" → "L1"
-	static FName StateTagToSectionName(const FGameplayTag& Tag);
 };

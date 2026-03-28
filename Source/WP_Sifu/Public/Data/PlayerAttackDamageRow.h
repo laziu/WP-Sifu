@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "GameplayTagContainer.h"
+#include "Animation/AnimMontage.h"
 #include "PlayerAttackDamageRow.generated.h"
 
 USTRUCT(BlueprintType)
@@ -24,4 +25,8 @@ struct FPlayerAttackDamageRow : public FTableRowBase
 	// 빈 값 = 일반 히트
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag ResultTag;
+
+	// 이 공격 상태에서 재생할 개별 AnimMontage
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSoftObjectPtr<UAnimMontage> Montage;
 };

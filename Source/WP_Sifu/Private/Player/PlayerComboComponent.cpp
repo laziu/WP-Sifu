@@ -20,9 +20,6 @@ UPlayerComboComponent::UPlayerComboComponent()
 	               TEXT("/Script/Engine.DataTable'/Game/Data/DT_PlayerComboTransition.DT_PlayerComboTransition'"));
 	Ext::SetObject(AttackDamageTable,
 	               TEXT("/Script/Engine.DataTable'/Game/Data/DT_PlayerAttackDamage.DT_PlayerAttackDamage'"));
-	Ext::SetObject(ComboMontage,
-	               TEXT(
-		               "/Script/Engine.AnimMontage'/Game/ART_FROM_SIFU/Player/SK_M_MainChar_01/Anims/AM_MainChar_Attack.AM_MainChar_Attack'"));
 }
 
 void UPlayerComboComponent::BeginPlay()
@@ -33,6 +30,7 @@ void UPlayerComboComponent::BeginPlay()
 
 	BuildTransitionLookup();
 	BuildDamageLookup();
+	PreloadMontages();
 }
 
 void UPlayerComboComponent::BuildTransitionLookup()
@@ -62,6 +60,19 @@ void UPlayerComboComponent::BuildDamageLookup()
 		if (Row->StateTag.IsValid())
 		{
 			DamageLookup.Add(Row->StateTag, Row);
+		}
+	}
+}
+
+void UPlayerComboComponent::PreloadMontages()
+{
+	MontageCache.Empty();
+	for (const auto& Pair : DamageLookup)
+	{
+		const TSoftObjectPtr<UAnimMontage>& SoftMontage = Pair.Value->Montage;
+		if (!SoftMontage.IsNull())
+		{
+			MontageCache.Add(Pair.Key, SoftMontage.LoadSynchronous());
 		}
 	}
 }
@@ -100,28 +111,32 @@ void UPlayerComboComponent::ExecuteTransition(const FTransitionEntry& Entry)
 	GetWorld()->GetTimerManager().ClearTimer(ParryResetTimerHandle);
 
 	auto* Character = Cast<ACharacter>(GetOwner());
-	if (!Character || !ComboMontage) return;
+	if (!Character) return;
 
 	auto* AnimInstance = Character->GetMesh()->GetAnimInstance();
 	if (!AnimInstance) return;
 
-	const FName SectionName = StateTagToSectionName(CurrentStateTag);
+	auto CachedMontage = MontageCache.Find(CurrentStateTag);
+	if (!CachedMontage || !*CachedMontage) return;
 
-	if (!AnimInstance->Montage_IsPlaying(ComboMontage))
-	{
-		AnimInstance->Montage_Play(ComboMontage);
+	ActiveMontage = *CachedMontage;
 
-		FOnMontageEnded EndDelegate;
-		EndDelegate.BindUObject(this, &UPlayerComboComponent::OnMontageEnded);
-		AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
-	}
+	// Playing a new montage on the same slot blends out the previous one automatically
+	AnimInstance->Montage_Play(ActiveMontage);
 
-	AnimInstance->Montage_JumpToSection(SectionName, ComboMontage);
+	FOnMontageEnded EndDelegate;
+	EndDelegate.BindUObject(this, &UPlayerComboComponent::OnMontageEnded);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, ActiveMontage);
 }
 
 void UPlayerComboComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	ResetToNeutral();
+	// Guard against stale delegates firing after a new montage has already started
+	if (Montage == ActiveMontage)
+	{
+		ActiveMontage = nullptr;
+		ResetToNeutral();
+	}
 }
 
 void UPlayerComboComponent::ResetToNeutral()
@@ -131,15 +146,19 @@ void UPlayerComboComponent::ResetToNeutral()
 	BufferedActionTag.Reset();
 	GetWorld()->GetTimerManager().ClearTimer(ParryResetTimerHandle);
 
-	if (auto* Character = Cast<ACharacter>(GetOwner()))
+	if (ActiveMontage)
 	{
-		if (auto* AnimInstance = Character->GetMesh()->GetAnimInstance())
+		if (auto* Character = Cast<ACharacter>(GetOwner()))
 		{
-			if (AnimInstance->Montage_IsPlaying(ComboMontage))
+			if (auto* AnimInstance = Character->GetMesh()->GetAnimInstance())
 			{
-				AnimInstance->Montage_Stop(0.25f, ComboMontage);
+				if (AnimInstance->Montage_IsPlaying(ActiveMontage))
+				{
+					AnimInstance->Montage_Stop(0.25f, ActiveMontage);
+				}
 			}
 		}
+		ActiveMontage = nullptr;
 	}
 }
 
@@ -160,11 +179,12 @@ void UPlayerComboComponent::SetCombatState(FGameplayTag NewStateTag)
 
 bool UPlayerComboComponent::IsAttacking() const
 {
+	if (!ActiveMontage) return false;
 	if (const auto* Character = Cast<ACharacter>(GetOwner()))
 	{
 		if (const auto* AnimInstance = Character->GetMesh()->GetAnimInstance())
 		{
-			return AnimInstance->Montage_IsPlaying(ComboMontage);
+			return AnimInstance->Montage_IsPlaying(ActiveMontage);
 		}
 	}
 	return false;
@@ -207,14 +227,4 @@ void UPlayerComboComponent::CloseTransitionWindow(FName TransitionId)
 	OpenTransitionWindows.Remove(TransitionId);
 }
 
-FName UPlayerComboComponent::StateTagToSectionName(const FGameplayTag& Tag)
-{
-	// "CombatState.L1" → "L1", "CombatState.Parry.L" → "Parry.L"
-	const FString TagStr = Tag.ToString();
-	const FString Prefix = TEXT("CombatState.");
-	if (TagStr.StartsWith(Prefix))
-	{
-		return FName(*TagStr.Mid(Prefix.Len()));
-	}
-	return FName(*TagStr);
-}
+
