@@ -13,7 +13,7 @@ struct FPlayerAttackDamageRow : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	// 이 공격에 대응하는 CombatState 태그
+	// 이 공격 또는 전투 상태에 대응하는 GameplayTag
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag StateTag;
 
@@ -21,7 +21,7 @@ struct FPlayerAttackDamageRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	double Damage = 0.;
 
-	// 히트 리액션 GameplayTag (HitReaction.Stun, HitReaction.Down 등)
+	// 히트 리액션 GameplayTag (Hit.Action.Stun, Hit.Action.Down 등)
 	// 빈 값 = 일반 히트
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag ResultTag;

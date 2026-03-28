@@ -65,7 +65,7 @@ struct FAttackPayload
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Attack)
 	bool bUnblockable = false;
 
-	// HitReaction tag (HitReaction.Stun, HitReaction.Down, etc.)
+	// HitReaction tag (Hit.Action.Stun, Hit.Action.Down, etc.)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Attack)
 	FGameplayTag HitReaction;
 };

@@ -26,7 +26,7 @@ void UPlayerComboComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CurrentStateTag = GameplayTag::CombatState_Neutral;
+	CurrentStateTag = GameplayTag::Combat_State_Neutral;
 
 	BuildTransitionLookup();
 	BuildDamageLookup();
@@ -86,10 +86,10 @@ void UPlayerComboComponent::InputAction(FGameplayTag ActionTag)
 		return;
 	}
 
-	// TODO: Appropriate state check with Neutral, Run, Parry 
-	if (CurrentStateTag == GameplayTag::CombatState_Neutral ||
-		CurrentStateTag == GameplayTag::CombatState_Run ||
-		CurrentStateTag == GameplayTag::CombatState_Parry ||
+	// TODO: Appropriate state check with Neutral, Run, Parry
+	if (CurrentStateTag == GameplayTag::Combat_State_Neutral ||
+		CurrentStateTag == GameplayTag::Combat_State_Neutral_Run ||
+		CurrentStateTag == GameplayTag::Combat_State_Parry ||
 		OpenTransitionWindows.Contains(EntryPtr->TransitionId))
 	{
 		ExecuteTransition(*EntryPtr);
@@ -141,7 +141,7 @@ void UPlayerComboComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrup
 
 void UPlayerComboComponent::ResetToNeutral()
 {
-	CurrentStateTag = GameplayTag::CombatState_Neutral;
+	CurrentStateTag = GameplayTag::Combat_State_Neutral;
 	OpenTransitionWindows.Empty();
 	BufferedActionTag.Reset();
 	GetWorld()->GetTimerManager().ClearTimer(ParryResetTimerHandle);
@@ -168,7 +168,7 @@ void UPlayerComboComponent::SetCombatState(FGameplayTag NewStateTag)
 
 	CurrentStateTag = NewStateTag;
 
-	if (NewStateTag == GameplayTag::CombatState_Parry)
+	if (NewStateTag == GameplayTag::Combat_State_Parry)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
 			ParryResetTimerHandle, this,

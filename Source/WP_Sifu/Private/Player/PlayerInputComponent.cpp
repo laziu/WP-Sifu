@@ -78,26 +78,26 @@ void UPlayerInputComponent::OnInputRunStarted()
 {
 	SetOwnerWalkSpeed(RunSpeed);
 	if (auto* Combo = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
-		Combo->SetCombatState(GameplayTag::CombatState_Run);
+		Combo->SetCombatState(GameplayTag::Combat_State_Neutral_Run);
 }
 
 void UPlayerInputComponent::OnInputRunStopped()
 {
 	SetOwnerWalkSpeed(WalkSpeed);
 	if (auto* Combo = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
-		Combo->SetCombatState(GameplayTag::CombatState_Neutral);
+		Combo->SetCombatState(GameplayTag::Combat_State_Neutral);
 }
 
 void UPlayerInputComponent::OnInputLightAttack()
 {
 	if (auto* Combo = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
-		Combo->InputAction(GameplayTag::AttackAction_Light);
+		Combo->InputAction(GameplayTag::Combat_Command_Light);
 }
 
 void UPlayerInputComponent::OnInputHeavyAttack()
 {
 	if (auto* Combo = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
-		Combo->InputAction(GameplayTag::AttackAction_Heavy);
+		Combo->InputAction(GameplayTag::Combat_Command_Heavy);
 }
 
 void UPlayerInputComponent::OnInputBlockStarted()

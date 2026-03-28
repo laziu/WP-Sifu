@@ -24,8 +24,8 @@ public class GameplayTagIndexer : ModuleRules
 
 	private struct TagEntry
 	{
-		public string FullTag; // e.g. "CombatState.Parry.L"
-		public string Variable; // e.g. "CombatState_Parry_L"
+		public string FullTag; // e.g. "Attack.Parry.L"
+		public string Variable; // e.g. "Attack_Parry_L"
 		public string Comment; // e.g. "Lightning Strikes"
 	}
 

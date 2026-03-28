@@ -93,7 +93,7 @@ EAttackResponse UPlayerCombatComponent::ApplyDamage(const FAttackPayload& Payloa
 			// Parry 성공 → 콤보 컴포넌트에 알림
 			if (auto* ComboComp = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
 			{
-				ComboComp->SetCombatState(GameplayTag::CombatState_Parry);
+				ComboComp->SetCombatState(GameplayTag::Combat_State_Parry);
 			}
 
 			return EAttackResponse::Parry;

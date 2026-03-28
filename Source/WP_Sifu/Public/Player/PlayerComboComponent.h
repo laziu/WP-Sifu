@@ -17,7 +17,7 @@ class WP_SIFU_API UPlayerComboComponent : public UActorComponent
 public:
 	UPlayerComboComponent();
 
-	// Action input (ActionTag: AttackAction.Light, AttackAction.Heavy, etc.)
+	// Action input (ActionTag: Combat.Command.Light, Combat.Command.Heavy, etc.)
 	UFUNCTION(BlueprintCallable, Category=Combo)
 	void InputAction(FGameplayTag ActionTag);
 
@@ -25,7 +25,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category=Combo)
 	void ResetToNeutral();
 
-	// Force special state (Run, Parr, etc.)
+	// Force special state (Run, Parry, etc.)
 	UFUNCTION(BlueprintCallable, Category=Combo)
 	void SetCombatState(FGameplayTag NewStateTag);
 
@@ -68,7 +68,7 @@ private:
 
 	TMap<TPair<FGameplayTag, FGameplayTag>, FTransitionEntry> TransitionLookup;
 
-	// AttackDamage lookup: StateTag → Row*
+	// AttackDamage lookup: attack/state tag -> row
 	TMap<FGameplayTag, const struct FPlayerAttackDamageRow*> DamageLookup;
 
 	// Preloaded montages: StateTag → Montage (populated at BeginPlay)
