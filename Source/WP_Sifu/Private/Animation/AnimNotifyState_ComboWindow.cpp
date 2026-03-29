@@ -16,7 +16,7 @@ void UAnimNotifyState_ComboWindow::NotifyBegin(
 	{
 		if (auto* ComboComp = Owner->FindComponentByClass<UPlayerComboComponent>())
 		{
-			ComboComp->OpenTransitionWindow(TransitionId);
+			ComboComp->OpenTransitionWindow(ActionTag);
 		}
 	}
 }
@@ -31,12 +31,12 @@ void UAnimNotifyState_ComboWindow::NotifyEnd(
 	{
 		if (auto* ComboComp = Owner->FindComponentByClass<UPlayerComboComponent>())
 		{
-			ComboComp->CloseTransitionWindow(TransitionId);
+			ComboComp->CloseTransitionWindow(ActionTag);
 		}
 	}
 }
 
 FString UAnimNotifyState_ComboWindow::GetNotifyName_Implementation() const
 {
-	return FString::Printf(TEXT("ComboWindow: %s"), *TransitionId.ToString());
+	return FString::Printf(TEXT("ComboWindow: %s"), *ActionTag.ToString());
 }

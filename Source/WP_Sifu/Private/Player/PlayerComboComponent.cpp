@@ -42,9 +42,7 @@ void UPlayerComboComponent::BuildTransitionLookup()
 	for (const auto& Pair : RowMap)
 	{
 		const auto* Row = reinterpret_cast<const FPlayerComboTransitionRow*>(Pair.Value);
-		TransitionLookup.Add(
-			{Row->CurrentStateTag, Row->ActionTag},
-			{Pair.Key, Row});
+		TransitionLookup.Add({Row->CurrentStateTag, Row->ActionTag}, Row);
 	}
 }
 
@@ -90,9 +88,9 @@ void UPlayerComboComponent::InputAction(FGameplayTag ActionTag)
 	if (CurrentStateTag == GameplayTag::Combat_State_Neutral ||
 		CurrentStateTag == GameplayTag::Combat_State_Neutral_Run ||
 		CurrentStateTag == GameplayTag::Combat_State_Parry ||
-		OpenTransitionWindows.Contains(EntryPtr->TransitionId))
+		OpenTransitionWindows.Contains(ActionTag))
 	{
-		ExecuteTransition(*EntryPtr);
+		ExecuteTransition(**EntryPtr);
 	}
 	else
 	{
@@ -101,9 +99,9 @@ void UPlayerComboComponent::InputAction(FGameplayTag ActionTag)
 	}
 }
 
-void UPlayerComboComponent::ExecuteTransition(const FTransitionEntry& Entry)
+void UPlayerComboComponent::ExecuteTransition(const FPlayerComboTransitionRow& Entry)
 {
-	CurrentStateTag = Entry.Row->NextStateTag;
+	CurrentStateTag = Entry.NextStateTag;
 	OpenTransitionWindows.Empty();
 	BufferedActionTag.Reset();
 
@@ -205,26 +203,24 @@ FAttackPayload UPlayerComboComponent::MakeCurrentAttackPayload() const
 	return Payload;
 }
 
-void UPlayerComboComponent::OpenTransitionWindow(FName TransitionId)
+void UPlayerComboComponent::OpenTransitionWindow(FGameplayTag ActionTag)
 {
-	OpenTransitionWindows.Add(TransitionId);
+	OpenTransitionWindows.Add(ActionTag);
 
 	if (BufferedActionTag.IsSet())
 	{
 		const auto Key = TPair<FGameplayTag, FGameplayTag>{CurrentStateTag, BufferedActionTag.GetValue()};
 		if (const auto* EntryPtr = TransitionLookup.Find(Key))
 		{
-			if (EntryPtr->TransitionId == TransitionId)
+			if ((*EntryPtr)->ActionTag == ActionTag)
 			{
-				ExecuteTransition(*EntryPtr);
+				ExecuteTransition(**EntryPtr);
 			}
 		}
 	}
 }
 
-void UPlayerComboComponent::CloseTransitionWindow(FName TransitionId)
+void UPlayerComboComponent::CloseTransitionWindow(FGameplayTag ActionTag)
 {
-	OpenTransitionWindows.Remove(TransitionId);
+	OpenTransitionWindows.Remove(ActionTag);
 }
-
-

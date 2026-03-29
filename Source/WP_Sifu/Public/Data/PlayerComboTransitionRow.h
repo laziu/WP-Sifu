@@ -11,9 +11,6 @@ USTRUCT(BlueprintType)
 struct FPlayerComboTransitionRow : public FTableRowBase
 {
 	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FName TransitionId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag CurrentStateTag;

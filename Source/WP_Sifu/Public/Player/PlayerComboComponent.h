@@ -41,10 +41,10 @@ public:
 	// --- AnimNotify Function ---
 
 	UFUNCTION(BlueprintCallable, Category=Combo)
-	void OpenTransitionWindow(FName TransitionId);
+	void OpenTransitionWindow(FGameplayTag ActionTag);
 
 	UFUNCTION(BlueprintCallable, Category=Combo)
-	void CloseTransitionWindow(FName TransitionId);
+	void CloseTransitionWindow(FGameplayTag ActionTag);
 
 protected:
 	virtual void BeginPlay() override;
@@ -57,16 +57,9 @@ protected:
 
 private:
 	FGameplayTag CurrentStateTag;
-	TSet<FName> OpenTransitionWindows;
+	TSet<FGameplayTag> OpenTransitionWindows;
 
-	// (CurrentStateTag, ActionTag) → {TransitionId, Row*}
-	struct FTransitionEntry
-	{
-		FName TransitionId; // RowName
-		const struct FPlayerComboTransitionRow* Row;
-	};
-
-	TMap<TPair<FGameplayTag, FGameplayTag>, FTransitionEntry> TransitionLookup;
+	TMap<TPair<FGameplayTag, FGameplayTag>, const struct FPlayerComboTransitionRow*> TransitionLookup;
 
 	// AttackDamage lookup: attack/state tag -> row
 	TMap<FGameplayTag, const struct FPlayerAttackDamageRow*> DamageLookup;
@@ -87,5 +80,5 @@ private:
 	void BuildTransitionLookup();
 	void BuildDamageLookup();
 	void PreloadMontages();
-	void ExecuteTransition(const FTransitionEntry& Entry);
+	void ExecuteTransition(const struct FPlayerComboTransitionRow& Entry);
 };
