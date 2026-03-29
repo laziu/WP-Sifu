@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PlayerCombatComponent.h"
+#include "PlayerCombatInteractionComponent.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
@@ -10,12 +10,12 @@
 #include "PlayerAttackComponent.h"
 
 
-UPlayerCombatComponent::UPlayerCombatComponent()
+UPlayerCombatInteractionComponent::UPlayerCombatInteractionComponent()
 {
 	bWantsInitializeComponent = true;
 }
 
-void UPlayerCombatComponent::InitializeComponent()
+void UPlayerCombatInteractionComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
@@ -23,7 +23,7 @@ void UPlayerCombatComponent::InitializeComponent()
 	AbilitySystemComp = ASI->GetAbilitySystemComponent();
 }
 
-EAttackResponse UPlayerCombatComponent::ApplyDamage(const FAttackPayload& Payload)
+EAttackResponse UPlayerCombatInteractionComponent::ApplyDamage(const FAttackPayload& Payload)
 {
 	switch (DefenceState)
 	{
@@ -105,7 +105,7 @@ EAttackResponse UPlayerCombatComponent::ApplyDamage(const FAttackPayload& Payloa
 	}
 }
 
-bool UPlayerCombatComponent::IsAttackFromBehind(const FVector& ImpactLocation) const
+bool UPlayerCombatInteractionComponent::IsAttackFromBehind(const FVector& ImpactLocation) const
 {
 	// false when ImpactLocation is not set (e.g., for unblockable attacks where location is irrelevant)
 	if (ImpactLocation.IsZero())
@@ -121,24 +121,24 @@ bool UPlayerCombatComponent::IsAttackFromBehind(const FVector& ImpactLocation) c
 	return FVector::DotProduct(Forward, ToImpact) < 0.f;
 }
 
-void UPlayerCombatComponent::StartBlock()
+void UPlayerCombatInteractionComponent::StartBlock()
 {
 	bBlockKeyHeld = true;
 	SetDefenceState(EDefenceState::Parrying);
 	GetWorld()->GetTimerManager().SetTimer(
 		ParryTimerHandle, this,
-		&UPlayerCombatComponent::OnParryWindowExpired,
+		&UPlayerCombatInteractionComponent::OnParryWindowExpired,
 		ParryWindowDuration, false);
 }
 
-void UPlayerCombatComponent::StopBlock()
+void UPlayerCombatInteractionComponent::StopBlock()
 {
 	bBlockKeyHeld = false;
 	GetWorld()->GetTimerManager().ClearTimer(ParryTimerHandle);
 	SetDefenceState(EDefenceState::None);
 }
 
-void UPlayerCombatComponent::OnParryWindowExpired()
+void UPlayerCombatInteractionComponent::OnParryWindowExpired()
 {
 	if (bBlockKeyHeld)
 		SetDefenceState(EDefenceState::Blocking);

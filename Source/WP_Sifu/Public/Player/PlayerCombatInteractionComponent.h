@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CombatComponentBase.h"
-#include "PlayerCombatComponent.generated.h"
+#include "CombatInteractionComponentBase.h"
+#include "PlayerCombatInteractionComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Combat), meta=(BlueprintSpawnableComponent))
-class WP_SIFU_API UPlayerCombatComponent : public UCombatComponentBase
+class WP_SIFU_API UPlayerCombatInteractionComponent : public UCombatInteractionComponentBase
 {
 	GENERATED_BODY()
 
 public:
-	UPlayerCombatComponent();
+	UPlayerCombatInteractionComponent();
 
 	// Block 키 입력 처리
 	void StartBlock();

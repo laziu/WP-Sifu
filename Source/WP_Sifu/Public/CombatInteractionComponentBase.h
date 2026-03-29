@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Attackable.h"
-#include "CombatComponentBase.generated.h"
+#include "CombatInteractionComponentBase.generated.h"
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(
@@ -32,7 +32,7 @@ enum class EDefenceState : uint8
  * Player/Enemy common combat component.
  */
 UCLASS(ClassGroup=(Combat), meta=(BlueprintSpawnableComponent), Blueprintable)
-class WP_SIFU_API UCombatComponentBase : public UActorComponent
+class WP_SIFU_API UCombatInteractionComponentBase : public UActorComponent
 {
 	GENERATED_BODY()
 

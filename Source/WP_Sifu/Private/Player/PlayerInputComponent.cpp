@@ -7,7 +7,7 @@
 #include "InputActionValue.h"
 #include "UserExtension.h"
 #include "PlayerAttackComponent.h"
-#include "PlayerCombatComponent.h"
+#include "PlayerCombatInteractionComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -102,14 +102,14 @@ void UPlayerInputComponent::OnInputHeavyAttack()
 
 void UPlayerInputComponent::OnInputBlockStarted()
 {
-	if (auto* Combat = GetOwner()->FindComponentByClass<UPlayerCombatComponent>())
-		Combat->StartBlock();
+	if (auto* CombatInteraction = GetOwner()->FindComponentByClass<UPlayerCombatInteractionComponent>())
+		CombatInteraction->StartBlock();
 }
 
 void UPlayerInputComponent::OnInputBlockStopped()
 {
-	if (auto* Combat = GetOwner()->FindComponentByClass<UPlayerCombatComponent>())
-		Combat->StopBlock();
+	if (auto* CombatInteraction = GetOwner()->FindComponentByClass<UPlayerCombatInteractionComponent>())
+		CombatInteraction->StopBlock();
 }
 
 void UPlayerInputComponent::SetOwnerWalkSpeed(double NewSpeed) const

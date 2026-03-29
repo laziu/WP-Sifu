@@ -32,7 +32,7 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	// IAttackable
-	virtual UCombatComponentBase* GetCombatComponent() const override;
+	virtual UCombatInteractionComponentBase* GetCombatInteractionComponent() const override;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input)
@@ -48,7 +48,7 @@ public:
 	TObjectPtr<class UAbilitySystemComponent> AbilitySystemComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
-	TObjectPtr<class UPlayerCombatComponent> CombatComp;
+	TObjectPtr<class UPlayerCombatInteractionComponent> CombatInteractionComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
 	TObjectPtr<class UPlayerAttackComponent> AttackComp;

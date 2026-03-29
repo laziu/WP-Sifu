@@ -81,7 +81,7 @@ class UAttackable : public UInterface
 
 /**
  * Shared hit-receive interface for Player and Enemy.
- * Actual logic is delegated to UCombatComponent.
+ * Actual logic is delegated to UCombatInteractionComponent.
  */
 class WP_SIFU_API IAttackable
 {
@@ -91,6 +91,6 @@ public:
 	// Called when receiving an attack
 	virtual EAttackResponse ReceiveAttack(const FAttackPayload& AttackPayload);
 
-	// Accessor for this Actor's CombatComponent
-	virtual class UCombatComponentBase* GetCombatComponent() const = 0;
+	// Accessor for this Actor's combat interaction component
+	virtual class UCombatInteractionComponentBase* GetCombatInteractionComponent() const = 0;
 };

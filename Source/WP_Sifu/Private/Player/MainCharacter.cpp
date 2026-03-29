@@ -9,7 +9,7 @@
 #include "CameraFocusComponent.h"
 #include "HealthAttributeSet.h"
 #include "PlayerAttackComponent.h"
-#include "PlayerCombatComponent.h"
+#include "PlayerCombatInteractionComponent.h"
 #include "UserExtension.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -54,7 +54,7 @@ AMainCharacter::AMainCharacter()
 	// Set ability system and combat-related components.
 	EXT_CREATE_DEFAULT_SUBOBJECT(AbilitySystemComp, TEXT("AbilitySystemComponent"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(HealthAttribs, TEXT("HealthAttributes"));
-	EXT_CREATE_DEFAULT_SUBOBJECT(CombatComp, TEXT("CombatComponent"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(CombatInteractionComp, TEXT("CombatInteractionComponent"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(AttackComp, TEXT("AttackComponent"));
 
 	HealthAttribs->InitHealth(MaxHealth);
@@ -97,7 +97,7 @@ UAbilitySystemComponent* AMainCharacter::GetAbilitySystemComponent() const
 	return AbilitySystemComp;
 }
 
-UCombatComponentBase* AMainCharacter::GetCombatComponent() const
+UCombatInteractionComponentBase* AMainCharacter::GetCombatInteractionComponent() const
 {
-	return CombatComp;
+	return CombatInteractionComp;
 }
