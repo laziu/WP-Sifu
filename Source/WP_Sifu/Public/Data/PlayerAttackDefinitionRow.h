@@ -6,25 +6,25 @@
 #include "Engine/DataTable.h"
 #include "GameplayTagContainer.h"
 #include "Animation/AnimMontage.h"
-#include "PlayerAttackDamageRow.generated.h"
+#include "PlayerAttackDefinitionRow.generated.h"
 
 USTRUCT(BlueprintType)
-struct FPlayerAttackDamageRow : public FTableRowBase
+struct FPlayerAttackDefinitionRow : public FTableRowBase
 {
 	GENERATED_BODY()
 
 	// 이 공격 또는 전투 상태에 대응하는 GameplayTag
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag StateTag;
+	FGameplayTag State;
 
 	// 기본 데미지 (HealthDamage = StructureDamage = Damage)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	double Damage = 0.;
 
-	// 히트 리액션 GameplayTag (Hit.Action.Stun, Hit.Action.Down 등)
+	// 히트 리액션 GameplayTag (Hit.Reaction.Stun, Hit.Reaction.Down 등)
 	// 빈 값 = 일반 히트
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag ResultTag;
+	FGameplayTag Reaction;
 
 	// 이 공격 상태에서 재생할 개별 AnimMontage
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

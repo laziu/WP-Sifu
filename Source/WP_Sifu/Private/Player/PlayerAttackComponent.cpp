@@ -6,7 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "GameplayTags.generated.h"
 #include "PlayerComboTransitionRow.h"
-#include "PlayerAttackDamageRow.h"
+#include "PlayerAttackDefinitionRow.h"
 #include "UserExtension.h"
 #include "WP_Sifu.h"
 #include "GameFramework/Character.h"
@@ -25,8 +25,8 @@ UPlayerAttackComponent::UPlayerAttackComponent()
 
 	Ext::SetObject(ComboTransitionTable,
 	               TEXT("/Script/Engine.DataTable'/Game/Data/DT_PlayerComboTransition.DT_PlayerComboTransition'"));
-	Ext::SetObject(AttackDamageTable,
-	               TEXT("/Script/Engine.DataTable'/Game/Data/DT_PlayerAttackDamage.DT_PlayerAttackDamage'"));
+	Ext::SetObject(AttackDefinitionTable,
+	               TEXT("/Script/Engine.DataTable'/Game/Data/DT_PlayerAttackDefinition.DT_PlayerAttackDefinition'"));
 }
 
 void UPlayerAttackComponent::SetupInputBindings(UEnhancedInputComponent* EIC)
@@ -50,12 +50,12 @@ void UPlayerAttackComponent::OnInputRunStopped()
 
 void UPlayerAttackComponent::OnInputLightAttack()
 {
-	InputAction(GameplayTag::Combat_Command_Light);
+	InputAction(GameplayTag::Combat_Input_Light);
 }
 
 void UPlayerAttackComponent::OnInputHeavyAttack()
 {
-	InputAction(GameplayTag::Combat_Command_Heavy);
+	InputAction(GameplayTag::Combat_Input_Heavy);
 }
 
 void UPlayerAttackComponent::BeginPlay()
@@ -65,7 +65,7 @@ void UPlayerAttackComponent::BeginPlay()
 	CurrentStateTag = GameplayTag::Combat_State_Neutral;
 
 	BuildTransitionLookup();
-	BuildDamageLookup();
+	BuildAttackDefinitionLookup();
 	PreloadMontages();
 }
 
@@ -78,22 +78,22 @@ void UPlayerAttackComponent::BuildTransitionLookup()
 	for (const auto& Pair : RowMap)
 	{
 		const auto* Row = reinterpret_cast<const FPlayerComboTransitionRow*>(Pair.Value);
-		TransitionLookup.Add({Row->CurrentStateTag, Row->ActionTag}, Row);
+		TransitionLookup.Add({Row->CurrentState, Row->Input}, Row);
 	}
 }
 
-void UPlayerAttackComponent::BuildDamageLookup()
+void UPlayerAttackComponent::BuildAttackDefinitionLookup()
 {
-	DamageLookup.Empty();
-	if (!AttackDamageTable) return;
+	AttackDefinitionLookup.Empty();
+	if (!AttackDefinitionTable) return;
 
-	const TMap<FName, uint8*>& RowMap = AttackDamageTable->GetRowMap();
+	const TMap<FName, uint8*>& RowMap = AttackDefinitionTable->GetRowMap();
 	for (const auto& Pair : RowMap)
 	{
-		const auto* Row = reinterpret_cast<const FPlayerAttackDamageRow*>(Pair.Value);
-		if (Row->StateTag.IsValid())
+		const auto* Row = reinterpret_cast<const FPlayerAttackDefinitionRow*>(Pair.Value);
+		if (Row->State.IsValid())
 		{
-			DamageLookup.Add(Row->StateTag, Row);
+			AttackDefinitionLookup.Add(Row->State, Row);
 		}
 	}
 }
@@ -101,7 +101,7 @@ void UPlayerAttackComponent::BuildDamageLookup()
 void UPlayerAttackComponent::PreloadMontages()
 {
 	MontageCache.Empty();
-	for (const auto& Pair : DamageLookup)
+	for (const auto& Pair : AttackDefinitionLookup)
 	{
 		const TSoftObjectPtr<UAnimMontage>& SoftMontage = Pair.Value->Montage;
 		if (!SoftMontage.IsNull())
@@ -111,9 +111,9 @@ void UPlayerAttackComponent::PreloadMontages()
 	}
 }
 
-void UPlayerAttackComponent::InputAction(FGameplayTag ActionTag)
+void UPlayerAttackComponent::InputAction(FGameplayTag InputTag)
 {
-	const auto Key = TPair<FGameplayTag, FGameplayTag>{CurrentStateTag, ActionTag};
+	const auto Key = TPair<FGameplayTag, FGameplayTag>{CurrentStateTag, InputTag};
 	const auto* EntryPtr = TransitionLookup.Find(Key);
 	if (!EntryPtr)
 	{
@@ -124,22 +124,22 @@ void UPlayerAttackComponent::InputAction(FGameplayTag ActionTag)
 	if (CurrentStateTag == GameplayTag::Combat_State_Neutral ||
 		CurrentStateTag == GameplayTag::Combat_State_Neutral_Run ||
 		CurrentStateTag == GameplayTag::Combat_State_Parry ||
-		OpenTransitionWindows.Contains(ActionTag))
+		OpenTransitionWindows.Contains(InputTag))
 	{
 		ExecuteTransition(**EntryPtr);
 	}
 	else
 	{
 		// queue input (max 1)
-		BufferedActionTag = ActionTag;
+		BufferedInputTag = InputTag;
 	}
 }
 
 void UPlayerAttackComponent::ExecuteTransition(const FPlayerComboTransitionRow& Entry)
 {
-	CurrentStateTag = Entry.NextStateTag;
+	CurrentStateTag = Entry.NextState;
 	OpenTransitionWindows.Empty();
-	BufferedActionTag.Reset();
+	BufferedInputTag.Reset();
 
 	// Clear parry reset timer after transition (consume it)
 	GetWorld()->GetTimerManager().ClearTimer(ParryResetTimerHandle);
@@ -177,7 +177,7 @@ void UPlayerAttackComponent::ResetToNeutral()
 {
 	CurrentStateTag = GameplayTag::Combat_State_Neutral;
 	OpenTransitionWindows.Empty();
-	BufferedActionTag.Reset();
+	BufferedInputTag.Reset();
 	GetWorld()->GetTimerManager().ClearTimer(ParryResetTimerHandle);
 
 	if (ActiveMontage)
@@ -229,26 +229,26 @@ FAttackPayload UPlayerAttackComponent::MakeCurrentAttackPayload() const
 	FAttackPayload Payload;
 	Payload.Instigator = GetOwner();
 
-	if (const auto* RowPtr = DamageLookup.Find(CurrentStateTag))
+	if (const auto* RowPtr = AttackDefinitionLookup.Find(CurrentStateTag))
 	{
 		Payload.HealthDamage = (*RowPtr)->Damage;
 		Payload.StructureDamage = (*RowPtr)->Damage;
-		Payload.HitReaction = (*RowPtr)->ResultTag;
+		Payload.HitReaction = (*RowPtr)->Reaction;
 	}
 
 	return Payload;
 }
 
-void UPlayerAttackComponent::OpenTransitionWindow(FGameplayTag ActionTag)
+void UPlayerAttackComponent::OpenTransitionWindow(FGameplayTag InputTag)
 {
-	OpenTransitionWindows.Add(ActionTag);
+	OpenTransitionWindows.Add(InputTag);
 
-	if (BufferedActionTag.IsSet())
+	if (BufferedInputTag.IsSet())
 	{
-		const auto Key = TPair<FGameplayTag, FGameplayTag>{CurrentStateTag, BufferedActionTag.GetValue()};
+		const auto Key = TPair<FGameplayTag, FGameplayTag>{CurrentStateTag, BufferedInputTag.GetValue()};
 		if (const auto* EntryPtr = TransitionLookup.Find(Key))
 		{
-			if ((*EntryPtr)->ActionTag == ActionTag)
+			if ((*EntryPtr)->Input == InputTag)
 			{
 				ExecuteTransition(**EntryPtr);
 			}
@@ -256,7 +256,7 @@ void UPlayerAttackComponent::OpenTransitionWindow(FGameplayTag ActionTag)
 	}
 }
 
-void UPlayerAttackComponent::CloseTransitionWindow(FGameplayTag ActionTag)
+void UPlayerAttackComponent::CloseTransitionWindow(FGameplayTag InputTag)
 {
-	OpenTransitionWindows.Remove(ActionTag);
+	OpenTransitionWindows.Remove(InputTag);
 }

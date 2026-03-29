@@ -20,9 +20,9 @@ public:
 
 	virtual void SetupInputBindings(class UEnhancedInputComponent* EIC) override;
 
-	// Action input (ActionTag: Combat.Command.Light, Combat.Command.Heavy, etc.)
+	// Input tag (Combat.Input.Light, Combat.Input.Heavy, etc.)
 	UFUNCTION(BlueprintCallable, Category=Attack)
-	void InputAction(FGameplayTag ActionTag);
+	void InputAction(FGameplayTag InputTag);
 
 	// Reset to neutral (with stopping montage)
 	UFUNCTION(BlueprintCallable, Category=Attack)
@@ -44,10 +44,10 @@ public:
 	// --- AnimNotify Function ---
 
 	UFUNCTION(BlueprintCallable, Category=Attack)
-	void OpenTransitionWindow(FGameplayTag ActionTag);
+	void OpenTransitionWindow(FGameplayTag InputTag);
 
 	UFUNCTION(BlueprintCallable, Category=Attack)
-	void CloseTransitionWindow(FGameplayTag ActionTag);
+	void CloseTransitionWindow(FGameplayTag InputTag);
 
 protected:
 	virtual void BeginPlay() override;
@@ -65,7 +65,7 @@ protected:
 	TObjectPtr<UDataTable> ComboTransitionTable;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Attack)
-	TObjectPtr<UDataTable> AttackDamageTable;
+	TObjectPtr<UDataTable> AttackDefinitionTable;
 
 private:
 	FGameplayTag CurrentStateTag;
@@ -73,16 +73,16 @@ private:
 
 	TMap<TPair<FGameplayTag, FGameplayTag>, const struct FPlayerComboTransitionRow*> TransitionLookup;
 
-	// AttackDamage lookup: attack/state tag -> row
-	TMap<FGameplayTag, const struct FPlayerAttackDamageRow*> DamageLookup;
+	// Attack definition lookup: state tag -> row
+	TMap<FGameplayTag, const struct FPlayerAttackDefinitionRow*> AttackDefinitionLookup;
 
-	// Preloaded montages: StateTag → Montage (populated at BeginPlay)
+	// Preloaded montages: State → Montage (populated at BeginPlay)
 	TMap<FGameplayTag, TObjectPtr<class UAnimMontage>> MontageCache;
 
 	// Currently playing montage (nullptr when not attacking)
 	TObjectPtr<class UAnimMontage> ActiveMontage;
 
-	TOptional<FGameplayTag> BufferedActionTag;
+	TOptional<FGameplayTag> BufferedInputTag;
 
 	// Parry -> Neutral Timer
 	FTimerHandle ParryResetTimerHandle;
@@ -94,7 +94,7 @@ private:
 	void OnInputHeavyAttack();
 	void OnMontageEnded(class UAnimMontage* Montage, bool bInterrupted);
 	void BuildTransitionLookup();
-	void BuildDamageLookup();
+	void BuildAttackDefinitionLookup();
 	void PreloadMontages();
 	void ExecuteTransition(const struct FPlayerComboTransitionRow& Entry);
 };

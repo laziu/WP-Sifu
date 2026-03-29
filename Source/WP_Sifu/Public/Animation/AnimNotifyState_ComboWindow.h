@@ -14,7 +14,7 @@ class WP_SIFU_API UAnimNotifyState_ComboWindow : public UAnimNotifyState
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Combo)
-	FGameplayTag ActionTag;
+	FGameplayTag InputTag;
 
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
 	                         float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
