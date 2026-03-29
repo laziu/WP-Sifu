@@ -7,7 +7,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameplayTags.generated.h"
 #include "HealthAttributeSet.h"
-#include "PlayerComboComponent.h"
+#include "PlayerAttackComponent.h"
 
 
 UPlayerCombatComponent::UPlayerCombatComponent()
@@ -91,9 +91,9 @@ EAttackResponse UPlayerCombatComponent::ApplyDamage(const FAttackPayload& Payloa
 			}
 
 			// Parry 성공 → 콤보 컴포넌트에 알림
-			if (auto* ComboComp = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
+			if (auto* AttackComp = GetOwner()->FindComponentByClass<UPlayerAttackComponent>())
 			{
-				ComboComp->SetCombatState(GameplayTag::Combat_State_Parry);
+				AttackComp->SetState(GameplayTag::Combat_State_Parry);
 			}
 
 			return EAttackResponse::Parry;

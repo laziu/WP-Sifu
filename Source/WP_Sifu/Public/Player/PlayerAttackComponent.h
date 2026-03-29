@@ -6,53 +6,53 @@
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
 #include "Attackable.h"
-#include "PlayerComboComponent.generated.h"
+#include "PlayerAttackComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Combat), meta=(BlueprintSpawnableComponent))
-class WP_SIFU_API UPlayerComboComponent : public UActorComponent
+class WP_SIFU_API UPlayerAttackComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UPlayerComboComponent();
+	UPlayerAttackComponent();
 
 	// Action input (ActionTag: Combat.Command.Light, Combat.Command.Heavy, etc.)
-	UFUNCTION(BlueprintCallable, Category=Combo)
+	UFUNCTION(BlueprintCallable, Category=Attack)
 	void InputAction(FGameplayTag ActionTag);
 
 	// Reset to neutral (with stopping montage)
-	UFUNCTION(BlueprintCallable, Category=Combo)
+	UFUNCTION(BlueprintCallable, Category=Attack)
 	void ResetToNeutral();
 
 	// Force special state (Run, Parry, etc.)
-	UFUNCTION(BlueprintCallable, Category=Combo)
-	void SetCombatState(FGameplayTag NewStateTag);
+	UFUNCTION(BlueprintCallable, Category=Attack)
+	void SetState(FGameplayTag NewStateTag);
 
-	UFUNCTION(BlueprintPure, Category=Combo)
+	UFUNCTION(BlueprintPure, Category=Attack)
 	FGameplayTag GetCurrentStateTag() const { return CurrentStateTag; }
 
-	UFUNCTION(BlueprintPure, Category=Combo)
+	UFUNCTION(BlueprintPure, Category=Attack)
 	bool IsAttacking() const;
 
-	UFUNCTION(BlueprintPure, Category=Combo)
+	UFUNCTION(BlueprintPure, Category=Attack)
 	FAttackPayload MakeCurrentAttackPayload() const;
 
 	// --- AnimNotify Function ---
 
-	UFUNCTION(BlueprintCallable, Category=Combo)
+	UFUNCTION(BlueprintCallable, Category=Attack)
 	void OpenTransitionWindow(FGameplayTag ActionTag);
 
-	UFUNCTION(BlueprintCallable, Category=Combo)
+	UFUNCTION(BlueprintCallable, Category=Attack)
 	void CloseTransitionWindow(FGameplayTag ActionTag);
 
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Combo)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Attack)
 	TObjectPtr<UDataTable> ComboTransitionTable;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Combo)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Attack)
 	TObjectPtr<UDataTable> AttackDamageTable;
 
 private:

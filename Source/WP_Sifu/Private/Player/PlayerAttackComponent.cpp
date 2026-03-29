@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PlayerComboComponent.h"
+#include "PlayerAttackComponent.h"
 
 #include "GameplayTags.generated.h"
 #include "PlayerComboTransitionRow.h"
@@ -12,7 +12,7 @@
 #include "Engine/DataTable.h"
 
 
-UPlayerComboComponent::UPlayerComboComponent()
+UPlayerAttackComponent::UPlayerAttackComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
@@ -22,7 +22,7 @@ UPlayerComboComponent::UPlayerComboComponent()
 	               TEXT("/Script/Engine.DataTable'/Game/Data/DT_PlayerAttackDamage.DT_PlayerAttackDamage'"));
 }
 
-void UPlayerComboComponent::BeginPlay()
+void UPlayerAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -33,7 +33,7 @@ void UPlayerComboComponent::BeginPlay()
 	PreloadMontages();
 }
 
-void UPlayerComboComponent::BuildTransitionLookup()
+void UPlayerAttackComponent::BuildTransitionLookup()
 {
 	TransitionLookup.Empty();
 	if (!ComboTransitionTable) return;
@@ -46,7 +46,7 @@ void UPlayerComboComponent::BuildTransitionLookup()
 	}
 }
 
-void UPlayerComboComponent::BuildDamageLookup()
+void UPlayerAttackComponent::BuildDamageLookup()
 {
 	DamageLookup.Empty();
 	if (!AttackDamageTable) return;
@@ -62,7 +62,7 @@ void UPlayerComboComponent::BuildDamageLookup()
 	}
 }
 
-void UPlayerComboComponent::PreloadMontages()
+void UPlayerAttackComponent::PreloadMontages()
 {
 	MontageCache.Empty();
 	for (const auto& Pair : DamageLookup)
@@ -75,7 +75,7 @@ void UPlayerComboComponent::PreloadMontages()
 	}
 }
 
-void UPlayerComboComponent::InputAction(FGameplayTag ActionTag)
+void UPlayerAttackComponent::InputAction(FGameplayTag ActionTag)
 {
 	const auto Key = TPair<FGameplayTag, FGameplayTag>{CurrentStateTag, ActionTag};
 	const auto* EntryPtr = TransitionLookup.Find(Key);
@@ -99,7 +99,7 @@ void UPlayerComboComponent::InputAction(FGameplayTag ActionTag)
 	}
 }
 
-void UPlayerComboComponent::ExecuteTransition(const FPlayerComboTransitionRow& Entry)
+void UPlayerAttackComponent::ExecuteTransition(const FPlayerComboTransitionRow& Entry)
 {
 	CurrentStateTag = Entry.NextStateTag;
 	OpenTransitionWindows.Empty();
@@ -123,11 +123,11 @@ void UPlayerComboComponent::ExecuteTransition(const FPlayerComboTransitionRow& E
 	AnimInstance->Montage_Play(ActiveMontage);
 
 	FOnMontageEnded EndDelegate;
-	EndDelegate.BindUObject(this, &UPlayerComboComponent::OnMontageEnded);
+	EndDelegate.BindUObject(this, &UPlayerAttackComponent::OnMontageEnded);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, ActiveMontage);
 }
 
-void UPlayerComboComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+void UPlayerAttackComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	// Guard against stale delegates firing after a new montage has already started
 	if (Montage == ActiveMontage)
@@ -137,7 +137,7 @@ void UPlayerComboComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrup
 	}
 }
 
-void UPlayerComboComponent::ResetToNeutral()
+void UPlayerAttackComponent::ResetToNeutral()
 {
 	CurrentStateTag = GameplayTag::Combat_State_Neutral;
 	OpenTransitionWindows.Empty();
@@ -160,7 +160,7 @@ void UPlayerComboComponent::ResetToNeutral()
 	}
 }
 
-void UPlayerComboComponent::SetCombatState(FGameplayTag NewStateTag)
+void UPlayerAttackComponent::SetState(FGameplayTag NewStateTag)
 {
 	if (IsAttacking()) return;
 
@@ -170,12 +170,12 @@ void UPlayerComboComponent::SetCombatState(FGameplayTag NewStateTag)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
 			ParryResetTimerHandle, this,
-			&UPlayerComboComponent::ResetToNeutral,
+			&UPlayerAttackComponent::ResetToNeutral,
 			ParryStateDuration, false);
 	}
 }
 
-bool UPlayerComboComponent::IsAttacking() const
+bool UPlayerAttackComponent::IsAttacking() const
 {
 	if (!ActiveMontage) return false;
 	if (const auto* Character = Cast<ACharacter>(GetOwner()))
@@ -188,7 +188,7 @@ bool UPlayerComboComponent::IsAttacking() const
 	return false;
 }
 
-FAttackPayload UPlayerComboComponent::MakeCurrentAttackPayload() const
+FAttackPayload UPlayerAttackComponent::MakeCurrentAttackPayload() const
 {
 	FAttackPayload Payload;
 	Payload.Instigator = GetOwner();
@@ -203,7 +203,7 @@ FAttackPayload UPlayerComboComponent::MakeCurrentAttackPayload() const
 	return Payload;
 }
 
-void UPlayerComboComponent::OpenTransitionWindow(FGameplayTag ActionTag)
+void UPlayerAttackComponent::OpenTransitionWindow(FGameplayTag ActionTag)
 {
 	OpenTransitionWindows.Add(ActionTag);
 
@@ -220,7 +220,7 @@ void UPlayerComboComponent::OpenTransitionWindow(FGameplayTag ActionTag)
 	}
 }
 
-void UPlayerComboComponent::CloseTransitionWindow(FGameplayTag ActionTag)
+void UPlayerAttackComponent::CloseTransitionWindow(FGameplayTag ActionTag)
 {
 	OpenTransitionWindows.Remove(ActionTag);
 }

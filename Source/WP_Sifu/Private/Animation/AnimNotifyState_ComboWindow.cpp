@@ -3,7 +3,7 @@
 
 #include "AnimNotifyState_ComboWindow.h"
 
-#include "PlayerComboComponent.h"
+#include "PlayerAttackComponent.h"
 
 
 void UAnimNotifyState_ComboWindow::NotifyBegin(
@@ -14,9 +14,9 @@ void UAnimNotifyState_ComboWindow::NotifyBegin(
 
 	if (AActor* Owner = MeshComp->GetOwner())
 	{
-		if (auto* ComboComp = Owner->FindComponentByClass<UPlayerComboComponent>())
+		if (auto* AttackComp = Owner->FindComponentByClass<UPlayerAttackComponent>())
 		{
-			ComboComp->OpenTransitionWindow(ActionTag);
+			AttackComp->OpenTransitionWindow(ActionTag);
 		}
 	}
 }
@@ -29,9 +29,9 @@ void UAnimNotifyState_ComboWindow::NotifyEnd(
 
 	if (AActor* Owner = MeshComp->GetOwner())
 	{
-		if (auto* ComboComp = Owner->FindComponentByClass<UPlayerComboComponent>())
+		if (auto* AttackComp = Owner->FindComponentByClass<UPlayerAttackComponent>())
 		{
-			ComboComp->CloseTransitionWindow(ActionTag);
+			AttackComp->CloseTransitionWindow(ActionTag);
 		}
 	}
 }

@@ -6,7 +6,7 @@
 #include "GameplayTags.generated.h"
 #include "InputActionValue.h"
 #include "UserExtension.h"
-#include "PlayerComboComponent.h"
+#include "PlayerAttackComponent.h"
 #include "PlayerCombatComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -77,27 +77,27 @@ void UPlayerInputComponent::OnInputLook(const FInputActionValue& Value)
 void UPlayerInputComponent::OnInputRunStarted()
 {
 	SetOwnerWalkSpeed(RunSpeed);
-	if (auto* Combo = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
-		Combo->SetCombatState(GameplayTag::Combat_State_Neutral_Run);
+	if (auto* Attack = GetOwner()->FindComponentByClass<UPlayerAttackComponent>())
+		Attack->SetState(GameplayTag::Combat_State_Neutral_Run);
 }
 
 void UPlayerInputComponent::OnInputRunStopped()
 {
 	SetOwnerWalkSpeed(WalkSpeed);
-	if (auto* Combo = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
-		Combo->SetCombatState(GameplayTag::Combat_State_Neutral);
+	if (auto* Attack = GetOwner()->FindComponentByClass<UPlayerAttackComponent>())
+		Attack->SetState(GameplayTag::Combat_State_Neutral);
 }
 
 void UPlayerInputComponent::OnInputLightAttack()
 {
-	if (auto* Combo = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
-		Combo->InputAction(GameplayTag::Combat_Command_Light);
+	if (auto* Attack = GetOwner()->FindComponentByClass<UPlayerAttackComponent>())
+		Attack->InputAction(GameplayTag::Combat_Command_Light);
 }
 
 void UPlayerInputComponent::OnInputHeavyAttack()
 {
-	if (auto* Combo = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
-		Combo->InputAction(GameplayTag::Combat_Command_Heavy);
+	if (auto* Attack = GetOwner()->FindComponentByClass<UPlayerAttackComponent>())
+		Attack->InputAction(GameplayTag::Combat_Command_Heavy);
 }
 
 void UPlayerInputComponent::OnInputBlockStarted()

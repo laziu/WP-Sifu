@@ -7,7 +7,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "KismetAnimationLibrary.h"
-#include "PlayerComboComponent.h"
+#include "PlayerAttackComponent.h"
 
 void UMainCharAnimInstance::NativeInitializeAnimation()
 {
@@ -38,10 +38,10 @@ void UMainCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsFalling = Movement->IsFalling();
 
 	// Combat state
-	if (auto* ComboComp = Character->FindComponentByClass<UPlayerComboComponent>())
+	if (auto* AttackComp = Character->FindComponentByClass<UPlayerAttackComponent>())
 	{
-		CurrentCombatStateTag = ComboComp->GetCurrentStateTag();
-		bIsAttacking = ComboComp->IsAttacking();
+		CurrentCombatStateTag = AttackComp->GetCurrentStateTag();
+		bIsAttacking = AttackComp->IsAttacking();
 	}
 }
 

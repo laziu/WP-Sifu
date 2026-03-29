@@ -8,8 +8,8 @@
 #include "ThirdPersonCameraComponent.h"
 #include "CameraFocusComponent.h"
 #include "HealthAttributeSet.h"
+#include "PlayerAttackComponent.h"
 #include "PlayerCombatComponent.h"
-#include "PlayerComboComponent.h"
 #include "UserExtension.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -51,11 +51,11 @@ AMainCharacter::AMainCharacter()
 	GetCharacterMovement()->JumpZVelocity = 600.;
 	GetCharacterMovement()->AirControl = 0.2;
 
-	// Set ability system
+	// Set ability system and combat-related components.
 	EXT_CREATE_DEFAULT_SUBOBJECT(AbilitySystemComp, TEXT("AbilitySystemComponent"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(HealthAttribs, TEXT("HealthAttributes"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(CombatComp, TEXT("CombatComponent"));
-	EXT_CREATE_DEFAULT_SUBOBJECT(ComboComp, TEXT("ComboComponent"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(AttackComp, TEXT("AttackComponent"));
 
 	HealthAttribs->InitHealth(MaxHealth);
 	HealthAttribs->InitMaxHealth(MaxHealth);

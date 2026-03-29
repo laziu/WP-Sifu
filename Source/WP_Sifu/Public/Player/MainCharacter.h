@@ -51,7 +51,7 @@ public:
 	TObjectPtr<class UPlayerCombatComponent> CombatComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
-	TObjectPtr<class UPlayerComboComponent> ComboComp;
+	TObjectPtr<class UPlayerAttackComponent> AttackComp;
 
 	UPROPERTY()
 	TObjectPtr<class UHealthAttributeSet> HealthAttribs;
