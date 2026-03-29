@@ -36,7 +36,7 @@ public:
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input)
-	TObjectPtr<class UPlayerInputComponent> PlayerInputComp;
+	TObjectPtr<class UPlayerMoveComponent> PlayerMoveComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	TObjectPtr<class UThirdPersonCameraComponent> ThirdPersonCameraComp;

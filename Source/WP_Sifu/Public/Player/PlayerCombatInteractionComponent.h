@@ -4,16 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "CombatInteractionComponentBase.h"
+#include "IInputBindable.h"
 #include "PlayerCombatInteractionComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Combat), meta=(BlueprintSpawnableComponent))
-class WP_SIFU_API UPlayerCombatInteractionComponent : public UCombatInteractionComponentBase
+class WP_SIFU_API UPlayerCombatInteractionComponent : public UCombatInteractionComponentBase, public IInputBindable
 {
 	GENERATED_BODY()
 
 public:
 	UPlayerCombatInteractionComponent();
+
+	virtual void SetupInputBindings(class UEnhancedInputComponent* EIC) override;
 
 	// Block 키 입력 처리
 	void StartBlock();
@@ -25,6 +28,9 @@ protected:
 
 	// Core logic implementation
 	virtual EAttackResponse ApplyDamage(const FAttackPayload& Payload) override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
+	TObjectPtr<class UInputAction> InputBlock;
 
 private:
 	// Check hit direction based on ImpactLocation and player's forward vector

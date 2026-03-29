@@ -3,6 +3,8 @@
 
 #include "PlayerCombatInteractionComponent.h"
 
+#include "EnhancedInputComponent.h"
+#include "UserExtension.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "GameplayTags.generated.h"
@@ -13,6 +15,14 @@
 UPlayerCombatInteractionComponent::UPlayerCombatInteractionComponent()
 {
 	bWantsInitializeComponent = true;
+
+	Ext::SetObject(InputBlock, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Block.IA_Block'"));
+}
+
+void UPlayerCombatInteractionComponent::SetupInputBindings(UEnhancedInputComponent* EIC)
+{
+	EIC->BindAction(InputBlock, ETriggerEvent::Started, this, &UPlayerCombatInteractionComponent::StartBlock);
+	EIC->BindAction(InputBlock, ETriggerEvent::Completed, this, &UPlayerCombatInteractionComponent::StopBlock);
 }
 
 void UPlayerCombatInteractionComponent::InitializeComponent()
@@ -145,4 +155,3 @@ void UPlayerCombatInteractionComponent::OnParryWindowExpired()
 	else
 		SetDefenceState(EDefenceState::None);
 }
-

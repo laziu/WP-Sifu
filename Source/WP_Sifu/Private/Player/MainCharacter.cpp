@@ -4,7 +4,8 @@
 #include "MainCharacter.h"
 
 #include "AbilitySystemComponent.h"
-#include "PlayerInputComponent.h"
+#include "PlayerMoveComponent.h"
+#include "IInputBindable.h"
 #include "ThirdPersonCameraComponent.h"
 #include "CameraFocusComponent.h"
 #include "HealthAttributeSet.h"
@@ -37,7 +38,7 @@ AMainCharacter::AMainCharacter()
 	}
 
 	// Third-person camera & input components
-	EXT_CREATE_DEFAULT_SUBOBJECT(PlayerInputComp, TEXT("PlayerInput"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(PlayerMoveComp, TEXT("PlayerMove"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(ThirdPersonCameraComp, TEXT("ThirdPersonCamera"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(LockOnComp, TEXT("LockOn"));
 
@@ -85,9 +86,15 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	if (auto EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		if (PlayerInputComp)
+		TArray<UActorComponent*> Components;
+		GetComponents(Components);
+
+		for (UActorComponent* Comp : Components)
 		{
-			PlayerInputComp->SetupInputBindings(EnhancedInput);
+			if (IInputBindable* Bindable = Cast<IInputBindable>(Comp))
+			{
+				Bindable->SetupInputBindings(EnhancedInput);
+			}
 		}
 	}
 }

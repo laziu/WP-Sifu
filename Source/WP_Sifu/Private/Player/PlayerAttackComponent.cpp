@@ -3,6 +3,7 @@
 
 #include "PlayerAttackComponent.h"
 
+#include "EnhancedInputComponent.h"
 #include "GameplayTags.generated.h"
 #include "PlayerComboTransitionRow.h"
 #include "PlayerAttackDamageRow.h"
@@ -16,10 +17,45 @@ UPlayerAttackComponent::UPlayerAttackComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
+	Ext::SetObject(InputRun, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Run.IA_Run'"));
+	Ext::SetObject(InputLightAttack,
+	               TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_LightAttack.IA_LightAttack'"));
+	Ext::SetObject(InputHeavyAttack,
+	               TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_HeavyAttack.IA_HeavyAttack'"));
+
 	Ext::SetObject(ComboTransitionTable,
 	               TEXT("/Script/Engine.DataTable'/Game/Data/DT_PlayerComboTransition.DT_PlayerComboTransition'"));
 	Ext::SetObject(AttackDamageTable,
 	               TEXT("/Script/Engine.DataTable'/Game/Data/DT_PlayerAttackDamage.DT_PlayerAttackDamage'"));
+}
+
+void UPlayerAttackComponent::SetupInputBindings(UEnhancedInputComponent* EIC)
+{
+	EIC->BindAction(InputRun, ETriggerEvent::Started, this, &UPlayerAttackComponent::OnInputRunStarted);
+	EIC->BindAction(InputRun, ETriggerEvent::Completed, this, &UPlayerAttackComponent::OnInputRunStopped);
+	EIC->BindAction(InputRun, ETriggerEvent::Canceled, this, &UPlayerAttackComponent::OnInputRunStopped);
+	EIC->BindAction(InputLightAttack, ETriggerEvent::Started, this, &UPlayerAttackComponent::OnInputLightAttack);
+	EIC->BindAction(InputHeavyAttack, ETriggerEvent::Started, this, &UPlayerAttackComponent::OnInputHeavyAttack);
+}
+
+void UPlayerAttackComponent::OnInputRunStarted()
+{
+	SetState(GameplayTag::Combat_State_Neutral_Run);
+}
+
+void UPlayerAttackComponent::OnInputRunStopped()
+{
+	SetState(GameplayTag::Combat_State_Neutral);
+}
+
+void UPlayerAttackComponent::OnInputLightAttack()
+{
+	InputAction(GameplayTag::Combat_Command_Light);
+}
+
+void UPlayerAttackComponent::OnInputHeavyAttack()
+{
+	InputAction(GameplayTag::Combat_Command_Heavy);
 }
 
 void UPlayerAttackComponent::BeginPlay()

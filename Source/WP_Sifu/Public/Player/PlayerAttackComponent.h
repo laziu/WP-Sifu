@@ -6,16 +6,19 @@
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
 #include "Attackable.h"
+#include "IInputBindable.h"
 #include "PlayerAttackComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Combat), meta=(BlueprintSpawnableComponent))
-class WP_SIFU_API UPlayerAttackComponent : public UActorComponent
+class WP_SIFU_API UPlayerAttackComponent : public UActorComponent, public IInputBindable
 {
 	GENERATED_BODY()
 
 public:
 	UPlayerAttackComponent();
+
+	virtual void SetupInputBindings(class UEnhancedInputComponent* EIC) override;
 
 	// Action input (ActionTag: Combat.Command.Light, Combat.Command.Heavy, etc.)
 	UFUNCTION(BlueprintCallable, Category=Attack)
@@ -49,6 +52,15 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
+	TObjectPtr<class UInputAction> InputRun;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
+	TObjectPtr<class UInputAction> InputLightAttack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
+	TObjectPtr<class UInputAction> InputHeavyAttack;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Attack)
 	TObjectPtr<UDataTable> ComboTransitionTable;
 
@@ -76,6 +88,10 @@ private:
 	FTimerHandle ParryResetTimerHandle;
 	static constexpr float ParryStateDuration = 1.0f;
 
+	void OnInputRunStarted();
+	void OnInputRunStopped();
+	void OnInputLightAttack();
+	void OnInputHeavyAttack();
 	void OnMontageEnded(class UAnimMontage* Montage, bool bInterrupted);
 	void BuildTransitionLookup();
 	void BuildDamageLookup();
