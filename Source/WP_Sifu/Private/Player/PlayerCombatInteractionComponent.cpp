@@ -1,20 +1,31 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PlayerCombatComponent.h"
+#include "PlayerCombatInteractionComponent.h"
 
+#include "EnhancedInputComponent.h"
+#include "UserExtension.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTags.generated.h"
 #include "HealthAttributeSet.h"
-#include "PlayerComboComponent.h"
+#include "PlayerAttackComponent.h"
 
 
-UPlayerCombatComponent::UPlayerCombatComponent()
+UPlayerCombatInteractionComponent::UPlayerCombatInteractionComponent()
 {
 	bWantsInitializeComponent = true;
+
+	Ext::SetObject(InputBlock, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Block.IA_Block'"));
 }
 
-void UPlayerCombatComponent::InitializeComponent()
+void UPlayerCombatInteractionComponent::SetupInputBindings(UEnhancedInputComponent* EIC)
+{
+	EIC->BindAction(InputBlock, ETriggerEvent::Started, this, &UPlayerCombatInteractionComponent::StartBlock);
+	EIC->BindAction(InputBlock, ETriggerEvent::Completed, this, &UPlayerCombatInteractionComponent::StopBlock);
+}
+
+void UPlayerCombatInteractionComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
@@ -22,7 +33,7 @@ void UPlayerCombatComponent::InitializeComponent()
 	AbilitySystemComp = ASI->GetAbilitySystemComponent();
 }
 
-EAttackResponse UPlayerCombatComponent::ApplyDamage(const FAttackPayload& Payload)
+EAttackResponse UPlayerCombatInteractionComponent::ApplyDamage(const FAttackPayload& Payload)
 {
 	switch (DefenceState)
 	{
@@ -90,10 +101,9 @@ EAttackResponse UPlayerCombatComponent::ApplyDamage(const FAttackPayload& Payloa
 			}
 
 			// Parry 성공 → 콤보 컴포넌트에 알림
-			if (auto* ComboComp = GetOwner()->FindComponentByClass<UPlayerComboComponent>())
+			if (auto* AttackComp = GetOwner()->FindComponentByClass<UPlayerAttackComponent>())
 			{
-				ComboComp->SetCombatState(
-					FGameplayTag::RequestGameplayTag(TEXT("CombatState.Parry")));
+				AttackComp->SetState(GameplayTag::Combat_State_Parry);
 			}
 
 			return EAttackResponse::Parry;
@@ -105,7 +115,7 @@ EAttackResponse UPlayerCombatComponent::ApplyDamage(const FAttackPayload& Payloa
 	}
 }
 
-bool UPlayerCombatComponent::IsAttackFromBehind(const FVector& ImpactLocation) const
+bool UPlayerCombatInteractionComponent::IsAttackFromBehind(const FVector& ImpactLocation) const
 {
 	// false when ImpactLocation is not set (e.g., for unblockable attacks where location is irrelevant)
 	if (ImpactLocation.IsZero())
@@ -121,28 +131,27 @@ bool UPlayerCombatComponent::IsAttackFromBehind(const FVector& ImpactLocation) c
 	return FVector::DotProduct(Forward, ToImpact) < 0.f;
 }
 
-void UPlayerCombatComponent::StartBlock()
+void UPlayerCombatInteractionComponent::StartBlock()
 {
 	bBlockKeyHeld = true;
 	SetDefenceState(EDefenceState::Parrying);
 	GetWorld()->GetTimerManager().SetTimer(
 		ParryTimerHandle, this,
-		&UPlayerCombatComponent::OnParryWindowExpired,
+		&UPlayerCombatInteractionComponent::OnParryWindowExpired,
 		ParryWindowDuration, false);
 }
 
-void UPlayerCombatComponent::StopBlock()
+void UPlayerCombatInteractionComponent::StopBlock()
 {
 	bBlockKeyHeld = false;
 	GetWorld()->GetTimerManager().ClearTimer(ParryTimerHandle);
 	SetDefenceState(EDefenceState::None);
 }
 
-void UPlayerCombatComponent::OnParryWindowExpired()
+void UPlayerCombatInteractionComponent::OnParryWindowExpired()
 {
 	if (bBlockKeyHeld)
 		SetDefenceState(EDefenceState::Blocking);
 	else
 		SetDefenceState(EDefenceState::None);
 }
-

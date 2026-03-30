@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
+#include "GameplayTagContainer.h"
 #include "AnimNotifyState_ComboWindow.generated.h"
 
 UCLASS(meta=(DisplayName="Combo Transition Window"))
@@ -13,7 +14,7 @@ class WP_SIFU_API UAnimNotifyState_ComboWindow : public UAnimNotifyState
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Combo)
-	FName TransitionId;
+	FGameplayTag InputTag;
 
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
 	                         float TotalDuration, const FAnimNotifyEventReference& EventReference) override;

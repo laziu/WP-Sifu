@@ -4,12 +4,13 @@
 #include "MainCharacter.h"
 
 #include "AbilitySystemComponent.h"
-#include "PlayerInputComponent.h"
+#include "PlayerMoveComponent.h"
+#include "IInputBindable.h"
 #include "ThirdPersonCameraComponent.h"
 #include "CameraFocusComponent.h"
 #include "HealthAttributeSet.h"
-#include "PlayerCombatComponent.h"
-#include "PlayerComboComponent.h"
+#include "PlayerAttackComponent.h"
+#include "PlayerCombatInteractionComponent.h"
 #include "UserExtension.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -28,34 +29,24 @@ AMainCharacter::AMainCharacter()
 		GetMesh()->SetSkeletalMesh(TempMesh);
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0., 0., -88.), FRotator(0., -90., 0.));
 
-		if (auto TempAnim = Ext::OpenObject<UAnimBlueprint>(
-			TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Anims/ABP_MainCharacter.ABP_MainCharacter'")))
+		if (auto TempAnim = Ext::OpenClass<UAnimInstance>(
+			TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprints/Anims/ABP_MainCharacter.ABP_MainCharacter_C'")))
 		{
 			GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-			GetMesh()->SetAnimInstanceClass(TempAnim->GetClass());
+			GetMesh()->SetAnimInstanceClass(TempAnim);
 		}
 	}
 
 	// Third-person camera & input components
-	EXT_CREATE_DEFAULT_SUBOBJECT(PlayerInputComp, TEXT("PlayerInput"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(PlayerMoveComp, TEXT("PlayerMove"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(ThirdPersonCameraComp, TEXT("ThirdPersonCamera"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(LockOnComp, TEXT("LockOn"));
 
-	// Character rotation: follow the camera/controller yaw instead of movement direction
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = true;
-	bUseControllerRotationRoll = false;
-
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-	GetCharacterMovement()->RotationRate = FRotator(0., 540., 0.);
-	GetCharacterMovement()->JumpZVelocity = 600.;
-	GetCharacterMovement()->AirControl = 0.2;
-
-	// Set ability system
+	// Set ability system and combat-related components.
 	EXT_CREATE_DEFAULT_SUBOBJECT(AbilitySystemComp, TEXT("AbilitySystemComponent"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(HealthAttribs, TEXT("HealthAttributes"));
-	EXT_CREATE_DEFAULT_SUBOBJECT(CombatComp, TEXT("CombatComponent"));
-	EXT_CREATE_DEFAULT_SUBOBJECT(ComboComp, TEXT("ComboComponent"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(CombatInteractionComp, TEXT("CombatInteractionComponent"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(AttackComp, TEXT("AttackComponent"));
 
 	HealthAttribs->InitHealth(MaxHealth);
 	HealthAttribs->InitMaxHealth(MaxHealth);
@@ -85,9 +76,15 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	if (auto EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		if (PlayerInputComp)
+		TArray<UActorComponent*> Components;
+		GetComponents(Components);
+
+		for (UActorComponent* Comp : Components)
 		{
-			PlayerInputComp->SetupInputBindings(EnhancedInput);
+			if (IInputBindable* Bindable = Cast<IInputBindable>(Comp))
+			{
+				Bindable->SetupInputBindings(EnhancedInput);
+			}
 		}
 	}
 }
@@ -97,7 +94,7 @@ UAbilitySystemComponent* AMainCharacter::GetAbilitySystemComponent() const
 	return AbilitySystemComp;
 }
 
-UCombatComponentBase* AMainCharacter::GetCombatComponent() const
+UCombatInteractionComponentBase* AMainCharacter::GetCombatInteractionComponent() const
 {
-	return CombatComp;
+	return CombatInteractionComp;
 }

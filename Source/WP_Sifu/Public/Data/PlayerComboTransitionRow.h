@@ -11,16 +11,13 @@ USTRUCT(BlueprintType)
 struct FPlayerComboTransitionRow : public FTableRowBase
 {
 	GENERATED_BODY()
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FName TransitionId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag CurrentStateTag;
+	FGameplayTag CurrentState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag NextStateTag;
+	FGameplayTag NextState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag ActionTag;
+	FGameplayTag Input;
 };

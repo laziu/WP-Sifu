@@ -68,6 +68,36 @@ void UCameraFocusComponent::SwitchTarget(bool bToRight)
 	}
 }
 
+FVector UCameraFocusComponent::GetFacingDirection() const
+{
+	AActor* Owner = GetOwner();
+	if (!Owner) return FVector::ForwardVector;
+
+	// To focusing target if exists
+	if (IsValid(TargetActor))
+	{
+		const FVector ToTarget = TargetActor->GetActorLocation() - Owner->GetActorLocation();
+		const FVector ToTargetXY = FVector(ToTarget.X, ToTarget.Y, 0.);
+		if (!ToTargetXY.IsNearlyZero())
+		{
+			return ToTargetXY.GetSafeNormal();
+		}
+	}
+
+	// Camera forward
+	if (const auto Pawn = Cast<APawn>(Owner))
+	{
+		if (const auto PC = Pawn->GetController())
+		{
+			const FRotator Rot = PC->GetControlRotation();
+			const FRotator RotXY(0., Rot.Yaw, 0.);
+			return FRotationMatrix(RotXY).GetUnitAxis(EAxis::X);
+		}
+	}
+
+	return Owner->GetActorForwardVector();
+}
+
 AActor* UCameraFocusComponent::FindBestTarget() const
 {
 	AActor* Owner = GetOwner();

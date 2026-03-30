@@ -5,6 +5,11 @@
 	"Description": "",
 	"Modules": [
 		{
+			"Name": "GameplayTagIndexer",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
 			"Name": "WP_Sifu",
 			"Type": "Runtime",
 			"LoadingPhase": "Default",

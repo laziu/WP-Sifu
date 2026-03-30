@@ -3,10 +3,11 @@
 
 #include "MainCharAnimInstance.h"
 
+#include "CameraFocusComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "KismetAnimationLibrary.h"
-#include "PlayerComboComponent.h"
+#include "PlayerAttackComponent.h"
 
 void UMainCharAnimInstance::NativeInitializeAnimation()
 {
@@ -28,11 +29,7 @@ void UMainCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Velocity = Movement->Velocity;
 	GroundSpeed = Velocity.Size2D();
 
-	TurnAngle = UKismetAnimationLibrary::CalculateDirection(Velocity, Character->GetActorRotation());
-	if (Movement->bOrientRotationToMovement)
-	{
-		TurnAngle = FMath::Clamp(TurnAngle, -45.f, 45.f);
-	}
+	TurnAngle = UKismetAnimationLibrary::CalculateDirection(Velocity, GetFacingDirection().Rotation());
 
 	constexpr float MoveThreshold = 0.01;
 	bShouldMove = (GroundSpeed > MoveThreshold) &&
@@ -41,9 +38,29 @@ void UMainCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsFalling = Movement->IsFalling();
 
 	// Combat state
-	if (auto* ComboComp = Character->FindComponentByClass<UPlayerComboComponent>())
+	if (auto* AttackComp = Character->FindComponentByClass<UPlayerAttackComponent>())
 	{
-		CurrentCombatStateTag = ComboComp->GetCurrentStateTag();
-		bIsAttacking = ComboComp->IsAttacking();
+		CurrentCombatStateTag = AttackComp->GetCurrentStateTag();
+		bIsAttacking = AttackComp->IsAttacking();
 	}
+}
+
+FVector UMainCharAnimInstance::GetFacingDirection() const
+{
+	if (!IsValid(Character)) return FVector::ZeroVector;
+
+	if (const auto CameraFocusComp = Cast<UCameraFocusComponent>(
+		Character->GetComponentByClass(UCameraFocusComponent::StaticClass())))
+	{
+		return CameraFocusComp->GetFacingDirection();
+	}
+
+	if (const auto PC = Character->GetController())
+	{
+		const FRotator Rot = PC->GetControlRotation();
+		const FRotator RotXY(0., Rot.Yaw, 0.);
+		return FRotationMatrix(RotXY).GetUnitAxis(EAxis::X);
+	}
+
+	return Character->GetActorForwardVector();
 }

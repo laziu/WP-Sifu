@@ -32,11 +32,11 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	// IAttackable
-	virtual UCombatComponentBase* GetCombatComponent() const override;
+	virtual UCombatInteractionComponentBase* GetCombatInteractionComponent() const override;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input)
-	TObjectPtr<class UPlayerInputComponent> PlayerInputComp;
+	TObjectPtr<class UPlayerMoveComponent> PlayerMoveComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	TObjectPtr<class UThirdPersonCameraComponent> ThirdPersonCameraComp;
@@ -48,10 +48,10 @@ public:
 	TObjectPtr<class UAbilitySystemComponent> AbilitySystemComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
-	TObjectPtr<class UPlayerCombatComponent> CombatComp;
+	TObjectPtr<class UPlayerCombatInteractionComponent> CombatInteractionComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
-	TObjectPtr<class UPlayerComboComponent> ComboComp;
+	TObjectPtr<class UPlayerAttackComponent> AttackComp;
 
 	UPROPERTY()
 	TObjectPtr<class UHealthAttributeSet> HealthAttribs;

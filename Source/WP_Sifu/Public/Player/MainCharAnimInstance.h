@@ -54,4 +54,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat")
 	bool bIsAttacking = false;
+
+	UFUNCTION(BlueprintPure, Category="Camera")
+	FVector GetFacingDirection() const;
 };

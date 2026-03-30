@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CombatComponentBase.h"
+#include "CombatInteractionComponentBase.h"
 #include "WP_Sifu.h"
 #include "Kismet/GameplayStatics.h"
 
 
-EAttackResponse UCombatComponentBase::ProcessReceivedAttack(const FAttackPayload& Payload)
+EAttackResponse UCombatInteractionComponentBase::ProcessReceivedAttack(const FAttackPayload& Payload)
 {
 	if (DefenceState == EDefenceState::Invincible)
 	{
@@ -20,7 +20,7 @@ EAttackResponse UCombatComponentBase::ProcessReceivedAttack(const FAttackPayload
 }
 
 
-EAttackResponse UCombatComponentBase::SendAttack(AActor* Target, const FAttackPayload& Payload) const
+EAttackResponse UCombatInteractionComponentBase::SendAttack(AActor* Target, const FAttackPayload& Payload) const
 {
 	if (!Target)
 	{
