@@ -43,7 +43,7 @@ protected:
 	double WalkSpeed = 150.;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character|Movement")
-	double RunSpeed = 300.;
+	double RunSpeed = 500.;
 
 private:
 	void OnInputMove(const struct FInputActionValue& Value);

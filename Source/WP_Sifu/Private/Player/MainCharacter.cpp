@@ -42,16 +42,6 @@ AMainCharacter::AMainCharacter()
 	EXT_CREATE_DEFAULT_SUBOBJECT(ThirdPersonCameraComp, TEXT("ThirdPersonCamera"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(LockOnComp, TEXT("LockOn"));
 
-	// Character rotation: follow the camera/controller yaw instead of movement direction
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = true;
-	bUseControllerRotationRoll = false;
-
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-	GetCharacterMovement()->RotationRate = FRotator(0., 540., 0.);
-	GetCharacterMovement()->JumpZVelocity = 600.;
-	GetCharacterMovement()->AirControl = 0.2;
-
 	// Set ability system and combat-related components.
 	EXT_CREATE_DEFAULT_SUBOBJECT(AbilitySystemComp, TEXT("AbilitySystemComponent"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(HealthAttribs, TEXT("HealthAttributes"));

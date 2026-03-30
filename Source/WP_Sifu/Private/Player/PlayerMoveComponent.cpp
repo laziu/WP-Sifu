@@ -12,6 +12,21 @@ UPlayerMoveComponent::UPlayerMoveComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
+	// Character rotation: follow the camera/controller yaw instead of movement direction
+	if (auto Character = Cast<ACharacter>(GetOwner()))
+	{
+		Character->bUseControllerRotationPitch = false;
+		Character->bUseControllerRotationYaw = true;
+		Character->bUseControllerRotationRoll = false;
+		if (auto Movement = Character->GetCharacterMovement())
+		{
+			Movement->bOrientRotationToMovement = false;
+			Movement->RotationRate = FRotator(0., 540., 0.);
+			Movement->JumpZVelocity = 600.;
+			Movement->AirControl = 0.2;
+		}
+	}
+
 	Ext::SetObject(InputMove, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Move.IA_Move'"));
 	Ext::SetObject(InputLook, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Look.IA_Look'"));
 	Ext::SetObject(InputRun, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Run.IA_Run'"));
@@ -60,11 +75,23 @@ void UPlayerMoveComponent::OnInputLook(const FInputActionValue& Value)
 void UPlayerMoveComponent::OnInputRunStarted()
 {
 	SetOwnerWalkSpeed(RunSpeed);
+
+	if (auto Character = Cast<ACharacter>(GetOwner()))
+	{
+		Character->bUseControllerRotationYaw = false;
+		Character->GetCharacterMovement()->bOrientRotationToMovement = true;
+	}
 }
 
 void UPlayerMoveComponent::OnInputRunStopped()
 {
 	SetOwnerWalkSpeed(WalkSpeed);
+
+	if (auto Character = Cast<ACharacter>(GetOwner()))
+	{
+		Character->bUseControllerRotationYaw = true;
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	}
 }
 
 void UPlayerMoveComponent::SetOwnerWalkSpeed(double NewSpeed) const
