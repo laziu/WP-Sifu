@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
 #include "Attackable.h"
-#include "IInputBindable.h"
+#include "InputBindable.h"
 #include "PlayerAttackComponent.generated.h"
 
 

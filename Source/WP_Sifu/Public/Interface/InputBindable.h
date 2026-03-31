@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "IInputBindable.generated.h"
+#include "InputBindable.generated.h"
 
 UINTERFACE(MinimalAPI)
 class UInputBindable : public UInterface

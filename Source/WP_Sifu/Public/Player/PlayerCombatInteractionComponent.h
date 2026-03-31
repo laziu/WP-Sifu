@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CombatInteractionComponentBase.h"
-#include "IInputBindable.h"
+#include "InputBindable.h"
 #include "PlayerCombatInteractionComponent.generated.h"
 
 
