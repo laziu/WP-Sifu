@@ -24,7 +24,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	virtual void SetupInputBindings(class UEnhancedInputComponent* EnhancedInputComponent) override;
+	virtual void SetupInputBindings(class UEnhancedInputComponent* EIC) override;
 
 protected:
 	/// Move input action (WASD)

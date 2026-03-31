@@ -27,8 +27,7 @@ class WP_SIFU_API AWeaponBase : public AActor
 public:
 	AWeaponBase();
 
-	// --- Components ---
-
+public: // --- Components ---
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Weapon)
 	TObjectPtr<class USceneComponent> Root;
 
@@ -40,24 +39,19 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Weapon)
 	TObjectPtr<class UAttackCollisionComponent> AttackCollision;
 
-	// --- Configuration ---
-
+public: // --- Configuration ---
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Weapon)
 	EWeaponType WeaponType = EWeaponType::OneHanded;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Weapon)
 	FName AttachSocketName = TEXT("HandR");
 
-	/**
-	 * Attack definition table used by PlayerAttackComponent when this weapon is
-	 * equipped.
-	 * Uses the FPlayerAttackDefinitionRow struct.
-	 */
+	/// Attack definition table used by PlayerAttackComponent when this weapon is equipped.
+	/// Uses the FPlayerAttackDefinitionRow struct.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Weapon)
 	TObjectPtr<class UDataTable> AttackDefinitionTable;
 
-	// --- Equip / Unequip ---
-
+public: // --- Equip / Unequip ---
 	UFUNCTION(BlueprintCallable, Category=Weapon)
 	void OnEquipped(class ACharacter* OwnerChar);
 

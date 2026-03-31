@@ -13,20 +13,20 @@ struct FPlayerAttackDefinitionRow : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	// 이 공격 또는 전투 상태에 대응하는 GameplayTag
+	/// Attack state GameplayTag (Attack.Type.L2, Attack.Type.Parry.L, etc.)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag State;
 
-	// 기본 데미지 (HealthDamage = StructureDamage = Damage)
+	/// Basic damage (current: HealthDamage = StructureDamage = Damage)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	double Damage = 0.;
 
-	// 히트 리액션 GameplayTag (Hit.Reaction.Stun, Hit.Reaction.Down 등)
-	// 빈 값 = 일반 히트
+	/// Hit reaction GameplayTag (Hit.Reaction.Stun, Hit.Reaction.Down, etc.)
+	/// blank = normal hit
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag Reaction;
 
-	// 이 공격 상태에서 재생할 개별 AnimMontage
+	/// Attack montage name to play when this attack is executed
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TSoftObjectPtr<UAnimMontage> Montage;
 };

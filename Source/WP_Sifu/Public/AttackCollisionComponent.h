@@ -27,8 +27,7 @@ class WP_SIFU_API UAttackCollisionComponent : public USceneComponent
 public:
 	UAttackCollisionComponent();
 
-	// --- Configuration ---
-
+public: // --- Configuration ---
 	/// Tag that identifies this attack source (Attack.Source.Hand.R, etc.)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Collision)
 	FGameplayTag AttackTag;
@@ -37,11 +36,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Collision)
 	TObjectPtr<UStaticMesh> CollisionMeshAsset;
 
-	/**
-	 * Trace channel used for sweeps.
-	 * Set this after adding the WeaponTrace channel in Project Settings.
-	 * Default: ECC_GameTraceChannel1 (when WeaponTrace is the first custom channel)
-	 */
+	/// Trace channel used for sweeps.
+	/// Set this after adding the WeaponTrace channel in Project Settings.
+	/// Default: ECC_GameTraceChannel1 (when WeaponTrace is the first custom channel) 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Collision)
 	TEnumAsByte<ECollisionChannel> TraceChannel = ECC_GameTraceChannel1;
 
@@ -49,8 +46,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Debug)
 	bool bShowCollisionMeshInEditor = true;
 
-	// --- Public Methods ---
-
+public: // --- Public Methods ---
 	/// Starts the sweep, clears hit tracking, and initializes PreviousLocation.
 	UFUNCTION(BlueprintCallable, Category=Collision)
 	void ActivateTrace();
@@ -64,8 +60,7 @@ public:
 
 	FGameplayTag GetAttackTag() const { return AttackTag; }
 
-	// --- Events ---
-
+public: // --- Events ---
 	/// Broadcast when an attack hit occurs. Subscribed to by AttackCollisionManagerComponent.
 	FOnAttackHit OnAttackHit;
 

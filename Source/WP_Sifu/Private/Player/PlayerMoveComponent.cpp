@@ -39,16 +39,13 @@ void UPlayerMoveComponent::BeginPlay()
 	SetOwnerWalkSpeed(WalkSpeed);
 }
 
-void UPlayerMoveComponent::SetupInputBindings(UEnhancedInputComponent* EnhancedInputComponent)
+void UPlayerMoveComponent::SetupInputBindings(UEnhancedInputComponent* EIC)
 {
-	EnhancedInputComponent->BindAction(InputMove, ETriggerEvent::Triggered, this, &UPlayerMoveComponent::OnInputMove);
-	EnhancedInputComponent->BindAction(InputLook, ETriggerEvent::Triggered, this, &UPlayerMoveComponent::OnInputLook);
-	EnhancedInputComponent->BindAction(
-		InputRun, ETriggerEvent::Started, this, &UPlayerMoveComponent::OnInputRunStarted);
-	EnhancedInputComponent->BindAction(
-		InputRun, ETriggerEvent::Completed, this, &UPlayerMoveComponent::OnInputRunStopped);
-	EnhancedInputComponent->BindAction(
-		InputRun, ETriggerEvent::Canceled, this, &UPlayerMoveComponent::OnInputRunStopped);
+	EIC->BindAction(InputMove, ETriggerEvent::Triggered, this, &UPlayerMoveComponent::OnInputMove);
+	EIC->BindAction(InputLook, ETriggerEvent::Triggered, this, &UPlayerMoveComponent::OnInputLook);
+	EIC->BindAction(InputRun, ETriggerEvent::Started, this, &UPlayerMoveComponent::OnInputRunStarted);
+	EIC->BindAction(InputRun, ETriggerEvent::Completed, this, &UPlayerMoveComponent::OnInputRunStopped);
+	EIC->BindAction(InputRun, ETriggerEvent::Canceled, this, &UPlayerMoveComponent::OnInputRunStopped);
 }
 
 void UPlayerMoveComponent::OnInputMove(const FInputActionValue& Value)

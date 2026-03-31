@@ -3,19 +3,19 @@
 
 #include "MainCharacter.h"
 
-#include "AbilitySystemComponent.h"
 #include "PlayerMoveComponent.h"
 #include "ThirdPersonCameraComponent.h"
 #include "CameraFocusComponent.h"
+#include "AbilitySystemComponent.h"
 #include "HealthAttributeSet.h"
 #include "PlayerAttackComponent.h"
 #include "PlayerCombatInteractionComponent.h"
 #include "AttackCollisionComponent.h"
 #include "AttackCollisionManagerComponent.h"
-#include "UserExtension.h"
 #include "EnhancedInputComponent.h"
-#include "GameplayTags.generated.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "UserExtension.h"
+#include "GameplayTags.generated.h"
 
 
 // Sets default values
@@ -40,16 +40,16 @@ AMainCharacter::AMainCharacter()
 	}
 
 	// Third-person camera & input components
-	EXT_CREATE_DEFAULT_SUBOBJECT(PlayerMoveComp, TEXT("PlayerMove"));
-	EXT_CREATE_DEFAULT_SUBOBJECT(ThirdPersonCameraComp, TEXT("ThirdPersonCamera"));
-	EXT_CREATE_DEFAULT_SUBOBJECT(LockOnComp, TEXT("LockOn"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(PlayerMove, TEXT("MoveSystem"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(ThirdPersonCamera, TEXT("CameraSystem"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(CameraFocus, TEXT("CameraFocusSystem"));
 
-	// Set ability system and combat-related components.
-	EXT_CREATE_DEFAULT_SUBOBJECT(AbilitySystemComp, TEXT("AbilitySystemComponent"));
-	EXT_CREATE_DEFAULT_SUBOBJECT(HealthAttribs, TEXT("HealthAttributes"));
-	EXT_CREATE_DEFAULT_SUBOBJECT(CombatInteractionComp, TEXT("CombatInteractionComponent"));
-	EXT_CREATE_DEFAULT_SUBOBJECT(AttackComp, TEXT("AttackComponent"));
-	EXT_CREATE_DEFAULT_SUBOBJECT(AttackCollisionManagerComp, TEXT("AttackCollisionManager"));
+	// Set ability system and combat-related components
+	EXT_CREATE_DEFAULT_SUBOBJECT(AbilitySystem, TEXT("AbilitySystem"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(HealthAttributes, TEXT("HealthAttributes"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(PlayerCombatInteraction, TEXT("CombatInteractionSystem"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(PlayerAttack, TEXT("AttackSystem"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(AttackCollisionManager, TEXT("AttackCollisionManager"));
 
 	// Unarmed hand/foot collision components (attached to skeletal mesh sockets)
 	struct _FCompConfig
@@ -114,13 +114,14 @@ AMainCharacter::AMainCharacter()
 			Comp->SetRelativeTransform(Config.Transform);
 		}
 
-		LimbCollisions.Add(Comp);
+		AttackCollisions.Add(Comp);
 	}
 
-	HealthAttribs->InitHealth(MaxHealth);
-	HealthAttribs->InitMaxHealth(MaxHealth);
-	HealthAttribs->InitStructure(0.f);
-	HealthAttribs->InitMaxStructure(MaxStructure);
+	// Set health values
+	HealthAttributes->InitHealth(MaxHealth);
+	HealthAttributes->InitMaxHealth(MaxHealth);
+	HealthAttributes->InitStructure(0.f);
+	HealthAttributes->InitMaxStructure(MaxStructure);
 }
 
 // Called when the game starts or when spawned
@@ -129,21 +130,21 @@ void AMainCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// Setup owner for ability system component
-	AbilitySystemComp->InitAbilityActorInfo(this, this);
+	AbilitySystem->InitAbilityActorInfo(this, this);
 
 	// Register the unarmed collision components
-	for (auto& Comp : LimbCollisions)
+	for (auto& Comp : AttackCollisions)
 	{
-		AttackCollisionManagerComp->RegisterPersistentCollision(Comp);
+		AttackCollisionManager->RegisterPersistentCollision(Comp);
 	}
 }
 
 UAbilitySystemComponent* AMainCharacter::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComp;
+	return AbilitySystem;
 }
 
 UCombatInteractionComponentBase* AMainCharacter::GetCombatInteractionComponent() const
 {
-	return CombatInteractionComp;
+	return PlayerCombatInteraction;
 }

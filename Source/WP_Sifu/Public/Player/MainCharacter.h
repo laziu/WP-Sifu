@@ -31,34 +31,35 @@ public:
 	// IAttackable
 	virtual UCombatInteractionComponentBase* GetCombatInteractionComponent() const override;
 
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Input)
-	TObjectPtr<class UPlayerMoveComponent> PlayerMoveComp;
+public: // --- Components ---
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Move)
+	TObjectPtr<class UPlayerMoveComponent> PlayerMove;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	TObjectPtr<class UThirdPersonCameraComponent> ThirdPersonCameraComp;
+	TObjectPtr<class UThirdPersonCameraComponent> ThirdPersonCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
-	TObjectPtr<class UCameraFocusComponent> LockOnComp;
+	TObjectPtr<class UCameraFocusComponent> CameraFocus;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Abilities)
-	TObjectPtr<class UAbilitySystemComponent> AbilitySystemComp;
+	TObjectPtr<class UAbilitySystemComponent> AbilitySystem;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
-	TObjectPtr<class UPlayerCombatInteractionComponent> CombatInteractionComp;
+	TObjectPtr<class UPlayerCombatInteractionComponent> PlayerCombatInteraction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
-	TObjectPtr<class UPlayerAttackComponent> AttackComp;
+	TObjectPtr<class UPlayerAttackComponent> PlayerAttack;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
-	TObjectPtr<class UAttackCollisionManagerComponent> AttackCollisionManagerComp;
+	TObjectPtr<class UAttackCollisionManagerComponent> AttackCollisionManager;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
-	TArray<TObjectPtr<class UAttackCollisionComponent>> LimbCollisions;
+	TArray<TObjectPtr<class UAttackCollisionComponent>> AttackCollisions;
 
 	UPROPERTY()
-	TObjectPtr<class UHealthAttributeSet> HealthAttribs;
+	TObjectPtr<class UHealthAttributeSet> HealthAttributes;
 
+public: // --- Configs ---
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Abilities)
 	float MaxHealth = 50.f;
 

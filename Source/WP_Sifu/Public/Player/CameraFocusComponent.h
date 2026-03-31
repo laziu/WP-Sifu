@@ -20,9 +20,12 @@ class WP_SIFU_API UCameraFocusComponent : public UActorComponent
 public:
 	UCameraFocusComponent();
 
+	virtual void BeginPlay() override;
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
+public:
 	/// Find and focus to the nearest target, or release if already exists.
 	UFUNCTION(BlueprintCallable, Category=Combat)
 	bool Focus();
@@ -48,8 +51,6 @@ public:
 	FVector GetFacingDirection() const;
 
 protected:
-	virtual void BeginPlay() override;
-
 	/// Maximum distance to search for focusing targets.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Focus)
 	double FocusRadius = 1500.;

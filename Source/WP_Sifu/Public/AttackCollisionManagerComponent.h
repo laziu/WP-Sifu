@@ -20,16 +20,13 @@ class WP_SIFU_API UAttackCollisionManagerComponent : public UActorComponent
 public:
 	UAttackCollisionManagerComponent();
 
-	// --- Public Methods ---
-
+public: // --- Public Methods ---
 	/// Finds the CollisionComponent mapped to AttackTag from an AnimNotifyState.
 	UFUNCTION(BlueprintCallable, Category=Combat)
 	class UAttackCollisionComponent* FindAttackCollision(const FGameplayTag& AttackTag) const;
 
-	/**
-	 * Registers unarmed collision components (hands/feet) by AttackTag.
-	 * Called for each component from AMainCharacter::BeginPlay.
-	 */
+	/// Registers unarmed collision components (hands/feet) by AttackTag.
+	/// Called for each component from AMainCharacter::BeginPlay.
 	void RegisterPersistentCollision(class UAttackCollisionComponent* Comp);
 
 	UFUNCTION(BlueprintCallable, Category=Weapon)
@@ -44,16 +41,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	// --- External References (cached in BeginPlay) ---
+private: // --- External References (cached in BeginPlay) ---
 	UPROPERTY()
 	TObjectPtr<class UCombatInteractionComponentBase> CombatComp;
 
 	UPROPERTY()
 	TObjectPtr<class UPlayerAttackComponent> AttackComp;
 
-	// --- State ---
-
+private: // --- State ---
 	UPROPERTY()
 	TObjectPtr<class AWeaponBase> EquippedWeapon;
 
@@ -68,7 +63,6 @@ private:
 	/// OnAttackHit subscription handles for registered persistent collisions
 	TMap<FGameplayTag, FDelegateHandle> HitDelegateHandles;
 
-	// --- Internal ---
-
+private: // --- Internal ---
 	void HandleHit(AActor* HitActor, const FHitResult& HitResult);
 };
