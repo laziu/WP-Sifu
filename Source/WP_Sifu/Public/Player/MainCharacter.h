@@ -3,13 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "InputBindableCharacter.h"
 #include "AbilitySystemInterface.h"
 #include "Attackable.h"
 #include "MainCharacter.generated.h"
 
 UCLASS()
-class WP_SIFU_API AMainCharacter : public ACharacter, public IAbilitySystemInterface, public IAttackable
+class WP_SIFU_API AMainCharacter :
+	public AInputBindableCharacter,
+	public IAbilitySystemInterface,
+	public IAttackable
 {
 	GENERATED_BODY()
 
@@ -22,12 +25,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	// AbilitySystemInterface
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 

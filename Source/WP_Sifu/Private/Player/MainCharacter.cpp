@@ -5,7 +5,6 @@
 
 #include "AbilitySystemComponent.h"
 #include "PlayerMoveComponent.h"
-#include "IInputBindable.h"
 #include "ThirdPersonCameraComponent.h"
 #include "CameraFocusComponent.h"
 #include "HealthAttributeSet.h"
@@ -61,32 +60,7 @@ void AMainCharacter::BeginPlay()
 
 	// Setup owner for ability system component
 	AbilitySystemComp->InitAbilityActorInfo(this, this);
-}
 
-// Called every frame
-void AMainCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
-// Called to bind functionality to input
-void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	if (auto EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		TArray<UActorComponent*> Components;
-		GetComponents(Components);
-
-		for (UActorComponent* Comp : Components)
-		{
-			if (IInputBindable* Bindable = Cast<IInputBindable>(Comp))
-			{
-				Bindable->SetupInputBindings(EnhancedInput);
-			}
-		}
-	}
 }
 
 UAbilitySystemComponent* AMainCharacter::GetAbilitySystemComponent() const
