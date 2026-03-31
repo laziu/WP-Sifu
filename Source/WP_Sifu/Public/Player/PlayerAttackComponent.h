@@ -41,6 +41,16 @@ public:
 	UFUNCTION(BlueprintPure, Category=Attack)
 	FAttackPayload MakeCurrentAttackPayload() const;
 
+	// --- Attack Table Management (swapped on weapon equip/unequip) ---
+
+	/// Replaces the current AttackDefinitionTable and rebuilds the cache.
+	UFUNCTION(BlueprintCallable, Category=Attack)
+	void SetAttackTable(UDataTable* NewTable);
+
+	/// Returns the default unarmed AttackDefinitionTable configured in the editor.
+	UFUNCTION(BlueprintPure, Category=Attack)
+	UDataTable* GetDefaultAttackTable() const { return DefaultAttackDefinitionTable; }
+
 	// --- AnimNotify Function ---
 
 	UFUNCTION(BlueprintCallable, Category=Attack)
@@ -66,6 +76,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Attack)
 	TObjectPtr<UDataTable> AttackDefinitionTable;
+
+	/// Default table configured in the editor, initialized in BeginPlay for restore.
+	UPROPERTY()
+	TObjectPtr<UDataTable> DefaultAttackDefinitionTable;
 
 private:
 	FGameplayTag CurrentStateTag;

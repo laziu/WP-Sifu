@@ -10,8 +10,11 @@
 #include "HealthAttributeSet.h"
 #include "PlayerAttackComponent.h"
 #include "PlayerCombatInteractionComponent.h"
+#include "AttackCollisionComponent.h"
+#include "AttackCollisionManagerComponent.h"
 #include "UserExtension.h"
 #include "EnhancedInputComponent.h"
+#include "GameplayTags.generated.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -46,6 +49,73 @@ AMainCharacter::AMainCharacter()
 	EXT_CREATE_DEFAULT_SUBOBJECT(HealthAttribs, TEXT("HealthAttributes"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(CombatInteractionComp, TEXT("CombatInteractionComponent"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(AttackComp, TEXT("AttackComponent"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(AttackCollisionManagerComp, TEXT("AttackCollisionManager"));
+
+	// Unarmed hand/foot collision components (attached to skeletal mesh sockets)
+	struct _FCompConfig
+	{
+		const TCHAR* Name;
+		FGameplayTag Tag;
+		FTransform Transform;
+		const TCHAR* AssetPath;
+	};
+	for (const auto& Config : std::initializer_list<_FCompConfig>{
+		     {
+			     TEXT("HandL"), GameplayTag::Attack_Source_Hand_L,
+			     FTransform(FRotator(0, 0, -20), FVector(1.0, 0.0, -0.5), FVector(1.0, 1.0, 0.5)),
+			     TEXT("/Script/Engine.StaticMesh'/Game/Meshes/SM_HandCollision.SM_HandCollision'")
+		     },
+		     {
+			     TEXT("HandR"), GameplayTag::Attack_Source_Hand_R,
+			     FTransform(FRotator(0, 0, -20), FVector(-1.0, 1.5, -4.5), FVector(1.0, 1.0, 0.5)),
+			     TEXT("/Script/Engine.StaticMesh'/Game/Meshes/SM_HandCollision.SM_HandCollision'")
+		     },
+		     {
+			     TEXT("FootL"), GameplayTag::Attack_Source_Foot_L,
+			     FTransform(FRotator(0, 0, -90), FVector(-3.5, 3.0, -1.5), FVector(1.0, 1.0, 1.0)),
+			     TEXT("/Script/Engine.StaticMesh'/Game/Meshes/SM_FootCollision.SM_FootCollision'")
+		     },
+		     {
+			     TEXT("FootR"), GameplayTag::Attack_Source_Foot_R,
+			     FTransform(FRotator(0, 0, 90), FVector(3.5, -3.0, 1.5), FVector(1.0, 1.0, 1.0)),
+			     TEXT("/Script/Engine.StaticMesh'/Game/Meshes/SM_FootCollision.SM_FootCollision'")
+		     },
+		     {
+			     TEXT("ElbowL"), GameplayTag::Attack_Source_Elbow_L,
+			     FTransform(FRotator(0, 0, 0), FVector(0.0, 0.0, 0.0), FVector(0.25, 0.25, 0.25)),
+			     TEXT("/Script/Engine.StaticMesh'/Game/Meshes/SM_HandCollision.SM_HandCollision'")
+		     },
+		     {
+			     TEXT("ElbowR"), GameplayTag::Attack_Source_Elbow_R,
+			     FTransform(FRotator(0, 0, 180), FVector(0.0, 0.0, 0.0), FVector(0.25, 0.25, 0.25)),
+			     TEXT("/Script/Engine.StaticMesh'/Game/Meshes/SM_HandCollision.SM_HandCollision'")
+		     },
+		     {
+			     TEXT("KneeL"), GameplayTag::Attack_Source_Knee_L,
+			     FTransform(FRotator(0, 0, 0), FVector(0.0, 0.0, 0.0), FVector(0.4, 0.4, 0.4)),
+			     TEXT("/Script/Engine.StaticMesh'/Game/Meshes/SM_HandCollision.SM_HandCollision'")
+		     },
+		     {
+			     TEXT("KneeR"), GameplayTag::Attack_Source_Knee_R,
+			     FTransform(FRotator(0, 0, 180), FVector(0.0, 0.0, 0.0), FVector(0.4, 0.4, 0.4)),
+			     TEXT("/Script/Engine.StaticMesh'/Game/Meshes/SM_HandCollision.SM_HandCollision'")
+		     },
+	     })
+	{
+		auto Comp = CreateDefaultSubobject<UAttackCollisionComponent>(
+			*FString::Printf(TEXT("AttackCollision_%s"), Config.Name));
+
+		Comp->AttackTag = Config.Tag;
+		Comp->SetupAttachment(GetMesh(), Config.Name);
+
+		if (auto StaticMesh = Ext::OpenObject<UStaticMesh>(Config.AssetPath))
+		{
+			Comp->CollisionMeshAsset = StaticMesh;
+			Comp->SetRelativeTransform(Config.Transform);
+		}
+
+		LimbCollisions.Add(Comp);
+	}
 
 	HealthAttribs->InitHealth(MaxHealth);
 	HealthAttribs->InitMaxHealth(MaxHealth);
@@ -61,6 +131,11 @@ void AMainCharacter::BeginPlay()
 	// Setup owner for ability system component
 	AbilitySystemComp->InitAbilityActorInfo(this, this);
 
+	// Register the unarmed collision components
+	for (auto& Comp : LimbCollisions)
+	{
+		AttackCollisionManagerComp->RegisterPersistentCollision(Comp);
+	}
 }
 
 UAbilitySystemComponent* AMainCharacter::GetAbilitySystemComponent() const

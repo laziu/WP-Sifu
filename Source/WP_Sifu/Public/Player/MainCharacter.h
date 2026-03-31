@@ -50,6 +50,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
 	TObjectPtr<class UPlayerAttackComponent> AttackComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
+	TObjectPtr<class UAttackCollisionManagerComponent> AttackCollisionManagerComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
+	TArray<TObjectPtr<class UAttackCollisionComponent>> LimbCollisions;
+
 	UPROPERTY()
 	TObjectPtr<class UHealthAttributeSet> HealthAttribs;
 
