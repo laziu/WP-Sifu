@@ -15,18 +15,4 @@ struct FPlayerAttackDefinitionRow : public FTableRowBase
 
 	// 이 공격 또는 전투 상태에 대응하는 GameplayTag
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag State;
-
-	// 기본 데미지 (HealthDamage = StructureDamage = Damage)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	double Damage = 0.;
-
-	// 히트 리액션 GameplayTag (Hit.Reaction.Stun, Hit.Reaction.Down 등)
-	// 빈 값 = 일반 히트
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag Reaction;
-
-	// 이 공격 상태에서 재생할 개별 AnimMontage
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TSoftObjectPtr<UAnimMontage> Montage;
-};
+	FGameplayTag 
