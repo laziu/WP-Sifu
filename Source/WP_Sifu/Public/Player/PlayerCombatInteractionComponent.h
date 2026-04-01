@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CombatInteractionComponentBase.h"
-#include "IInputBindable.h"
+#include "InputBindable.h"
 #include "PlayerCombatInteractionComponent.generated.h"
 
 
@@ -18,8 +18,11 @@ public:
 
 	virtual void SetupInputBindings(class UEnhancedInputComponent* EIC) override;
 
-	// Block 키 입력 처리
+public: /// --- Block input handlers ---
+	UFUNCTION(BlueprintCallable, Category=Combat)
 	void StartBlock();
+
+	UFUNCTION(BlueprintCallable, Category=Combat)
 	void StopBlock();
 
 protected:
@@ -33,17 +36,16 @@ protected:
 	TObjectPtr<class UInputAction> InputBlock;
 
 private:
-	// Check hit direction based on ImpactLocation and player's forward vector
+	/// Check hit direction based on ImpactLocation and player's forward vector
 	bool IsAttackFromBehind(const FVector& ImpactLocation) const;
 
-	// Dodging/Parrying 시 Structure 데미지에 곱해지는 비율 (임시)
+	/// Dodging/Parrying 시 Structure 데미지에 곱해지는 비율 (임시)
 	static constexpr float DeflectStructureRate = -2.f;
 
 	UPROPERTY()
 	TObjectPtr<class UAbilitySystemComponent> AbilitySystemComp;
 
-	// --- Parry/Block ---
-
+private: // --- Parry/Block ---
 	FTimerHandle ParryTimerHandle;
 
 	UPROPERTY(EditDefaultsOnly, Category=Combat)

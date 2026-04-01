@@ -26,29 +26,28 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Character)
 	TObjectPtr<class UCharacterMovementComponent> Movement;
 
-	// Movement velocity
+	/// Movement velocity
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	FVector Velocity;
 
-	// Movement speed in XY plane
+	/// Movement speed in XY plane
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	float GroundSpeed;
 
-	// Degree between the velocity and the actor rotation;
-	// clamped between ±45˚ to prevent backward animation when turning around
+	/// Degree between the velocity and the actor rotation;
+	/// clamped between ±45˚ to prevent backward animation when turning around
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	float TurnAngle;
 
-	// if ground speed is above a small threshold
+	/// if ground speed is above a small threshold
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	bool bShouldMove;
 
-	// Movement component falling state
+	/// Movement component falling state
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	bool bIsFalling;
 
-	// --- Combat ---
-
+protected: // --- Combat ---
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat")
 	FGameplayTag CurrentCombatStateTag;
 

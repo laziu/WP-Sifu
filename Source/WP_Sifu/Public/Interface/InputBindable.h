@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "IInputBindable.generated.h"
+#include "InputBindable.generated.h"
+
+// --- Interface ---
 
 UINTERFACE(MinimalAPI)
 class UInputBindable : public UInterface
@@ -18,4 +20,11 @@ class WP_SIFU_API IInputBindable
 
 public:
 	virtual void SetupInputBindings(class UEnhancedInputComponent* EIC) = 0;
+};
+
+// --- Helper ---
+
+struct WP_SIFU_API FInputBindingHelper
+{
+	static void BindAll(AActor* Actor, UInputComponent* InputComponent);
 };

@@ -39,33 +39,31 @@ struct FAttackPayload
 {
 	GENERATED_BODY()
 
-	// --- Damage values ---
-
+public: // --- Damage values ---
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Damage)
 	float HealthDamage = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Damage)
 	float StructureDamage = 0.f;
 
-	// --- Other properties ---
-
+public: // --- Other properties ---
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Attack)
 	EAttackPosition AttackPosition = EAttackPosition::None;
 
-	// Hit location; used by the receiver for front/back checks.
-	// Use ZeroVector for attacks where location is irrelevant (e.g., bUnblockable=true).
+	/// Hit location; used by the receiver for front/back checks.
+	/// Use ZeroVector for attacks where location is irrelevant (e.g., bUnblockable=true).
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Attack)
 	FVector ImpactLocation = FVector::ZeroVector;
 
-	// Instigator of the attack, for potential use in animation, etc.
+	/// Instigator of the attack, for potential use in animation, etc.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Attack)
 	TWeakObjectPtr<AActor> Instigator = nullptr;
 
-	// Whether this is a special attack (takedown, focus, etc. - always hits, cannot be blocked)
+	/// Whether this is a special attack (takedown, focus, etc. - always hits, cannot be blocked)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Attack)
 	bool bUnblockable = false;
 
-	// HitReaction tag (Hit.Reaction.Stun, Hit.Reaction.Down, etc.)
+	/// HitReaction tag (Hit.Reaction.Stun, Hit.Reaction.Down, etc.)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Attack)
 	FGameplayTag HitReaction;
 };
@@ -88,9 +86,9 @@ class WP_SIFU_API IAttackable
 	GENERATED_BODY()
 
 public:
-	// Called when receiving an attack
+	/// Called when receiving an attack
 	virtual EAttackResponse ReceiveAttack(const FAttackPayload& AttackPayload);
 
-	// Accessor for this Actor's combat interaction component
+	/// Accessor for this Actor's combat interaction component
 	virtual class UCombatInteractionComponentBase* GetCombatInteractionComponent() const = 0;
 };

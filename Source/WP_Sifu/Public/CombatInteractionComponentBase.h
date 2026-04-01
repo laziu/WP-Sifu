@@ -36,40 +36,30 @@ class WP_SIFU_API UCombatInteractionComponentBase : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:
-	// --- Interactions ---
-
-	// Receive attack; called from IAttackable::ReceiveAttack
+public: // --- Interactions ---
+	/// Receive attack; called from IAttackable::ReceiveAttack
 	UFUNCTION(BlueprintCallable, Category=Combat, meta=(ReturnDisplayName = "Response"))
 	EAttackResponse ProcessReceivedAttack(const FAttackPayload& Payload);
 
-	// Send attack to target Actor (calls ReceiveAttack if target implements IAttackable)
+	/// Send attack to target Actor (calls ReceiveAttack if target implements IAttackable)
 	UFUNCTION(BlueprintCallable, Category=Combat, meta=(ReturnDisplayName = "Response"))
 	EAttackResponse SendAttack(AActor* Target, const FAttackPayload& Payload) const;
 
-	// --- Events ---
-
+public: // --- Events ---
 	UPROPERTY(BlueprintAssignable)
 	FAttackRecvEvent OnAttackReceived;
 
 	UPROPERTY(BlueprintAssignable)
 	FAttackSendEvent OnAttackSent;
 
-protected:
-	// --- Internal logic ---
-
-	// Apply damage to attributes
-	virtual EAttackResponse ApplyDamage(const FAttackPayload& Payload)
-	{
-		return K2_ApplyDamage(Payload);
-	}
+protected: // --- Internal logic ---
+	/// Apply damage to attributes
+	virtual EAttackResponse ApplyDamage(const FAttackPayload& Payload) { return K2_ApplyDamage(Payload); }
 
 	UFUNCTION(BlueprintImplementableEvent, Category=Combat, meta=(DisplayName="Apply Damage"))
 	EAttackResponse K2_ApplyDamage(const FAttackPayload& Payload);
 
-
-	// --- Combat state ---
-public:
+public: // --- Combat state ---
 	UFUNCTION(BlueprintCallable, Category=Combat)
 	void SetDefenceState(EDefenceState NewState) { DefenceState = NewState; }
 
