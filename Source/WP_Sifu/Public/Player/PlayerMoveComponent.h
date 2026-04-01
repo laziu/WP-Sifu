@@ -21,9 +21,8 @@ public:
 	UPlayerMoveComponent();
 
 protected:
-	virtual void BeginPlay() override;
+	virtual void OnRegister() override;
 
-public:
 	virtual void SetupInputBindings(class UEnhancedInputComponent* EIC) override;
 
 protected:
@@ -50,8 +49,4 @@ private:
 	void OnInputLook(const struct FInputActionValue& Value);
 	void OnInputRunStarted();
 	void OnInputRunStopped();
-
-private:
-	/// Set move speed
-	void SetOwnerWalkSpeed(double NewSpeed) const;
 };

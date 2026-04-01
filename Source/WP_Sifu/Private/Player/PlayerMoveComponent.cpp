@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "UserExtension.h"
+#include "WP_Sifu.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -12,31 +13,27 @@ UPlayerMoveComponent::UPlayerMoveComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 
-	// Character rotation: follow the camera/controller yaw instead of movement direction
-	if (auto Character = Cast<ACharacter>(GetOwner()))
-	{
-		Character->bUseControllerRotationPitch = false;
-		Character->bUseControllerRotationYaw = true;
-		Character->bUseControllerRotationRoll = false;
-		if (auto Movement = Character->GetCharacterMovement())
-		{
-			Movement->bOrientRotationToMovement = false;
-			Movement->RotationRate = FRotator(0., 540., 0.);
-			Movement->JumpZVelocity = 600.;
-			Movement->AirControl = 0.2;
-		}
-	}
-
 	Ext::SetObject(InputMove, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Move.IA_Move'"));
 	Ext::SetObject(InputLook, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Look.IA_Look'"));
 	Ext::SetObject(InputRun, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Run.IA_Run'"));
 }
 
-void UPlayerMoveComponent::BeginPlay()
+void UPlayerMoveComponent::OnRegister()
 {
-	Super::BeginPlay();
+	Super::OnRegister();
 
-	SetOwnerWalkSpeed(WalkSpeed);
+	// Character rotation: follow the camera/controller yaw instead of movement direction
+	auto Character = CastChecked<ACharacter>(GetOwner());
+	Character->bUseControllerRotationPitch = false;
+	Character->bUseControllerRotationYaw = true;
+	Character->bUseControllerRotationRoll = false;
+
+	auto Movement = Character->GetCharacterMovement();
+	Movement->bOrientRotationToMovement = false;
+	Movement->MaxWalkSpeed = WalkSpeed;
+	Movement->RotationRate = FRotator(0., 540., 0.);
+	Movement->JumpZVelocity = 600.;
+	Movement->AirControl = 0.2;
 }
 
 void UPlayerMoveComponent::SetupInputBindings(UEnhancedInputComponent* EIC)
@@ -50,54 +47,39 @@ void UPlayerMoveComponent::SetupInputBindings(UEnhancedInputComponent* EIC)
 
 void UPlayerMoveComponent::OnInputMove(const FInputActionValue& Value)
 {
-	const auto Owner = CastChecked<ACharacter>(GetOwner());
-
 	const auto Input = Value.Get<FVector2D>();
 
-	const FRotationMatrix Rotation(FRotator(0., Owner->GetControlRotation().Yaw, 0.));
-	Owner->AddMovementInput(Rotation.GetUnitAxis(EAxis::X), Input.X);
-	Owner->AddMovementInput(Rotation.GetUnitAxis(EAxis::Y), Input.Y);
+	const auto Character = CastChecked<ACharacter>(GetOwner());
+	const FRotationMatrix Rotation(FRotator(0., Character->GetControlRotation().Yaw, 0.));
+	Character->AddMovementInput(Rotation.GetUnitAxis(EAxis::X), Input.X);
+	Character->AddMovementInput(Rotation.GetUnitAxis(EAxis::Y), Input.Y);
 }
 
 void UPlayerMoveComponent::OnInputLook(const FInputActionValue& Value)
 {
-	const auto Pawn = CastChecked<APawn>(GetOwner());
-
 	const auto Input = Value.Get<FVector2D>();
 
+	const auto Pawn = CastChecked<APawn>(GetOwner());
 	Pawn->AddControllerYawInput(Input.X);
 	Pawn->AddControllerPitchInput(Input.Y);
 }
 
 void UPlayerMoveComponent::OnInputRunStarted()
 {
-	SetOwnerWalkSpeed(RunSpeed);
+	const auto Character = CastChecked<ACharacter>(GetOwner());
+	const auto Movement = Character->GetCharacterMovement();
 
-	if (auto Character = Cast<ACharacter>(GetOwner()))
-	{
-		Character->bUseControllerRotationYaw = false;
-		Character->GetCharacterMovement()->bOrientRotationToMovement = true;
-	}
+	Character->bUseControllerRotationYaw = false;
+	Movement->bOrientRotationToMovement = true;
+	Movement->MaxWalkSpeed = RunSpeed;
 }
 
 void UPlayerMoveComponent::OnInputRunStopped()
 {
-	SetOwnerWalkSpeed(WalkSpeed);
+	const auto Character = CastChecked<ACharacter>(GetOwner());
+	const auto Movement = Character->GetCharacterMovement();
 
-	if (auto Character = Cast<ACharacter>(GetOwner()))
-	{
-		Character->bUseControllerRotationYaw = true;
-		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
-	}
-}
-
-void UPlayerMoveComponent::SetOwnerWalkSpeed(double NewSpeed) const
-{
-	if (const auto Owner = Cast<ACharacter>(GetOwner()))
-	{
-		if (auto* MovementComponent = Owner->GetCharacterMovement())
-		{
-			MovementComponent->MaxWalkSpeed = NewSpeed;
-		}
-	}
+	Character->bUseControllerRotationYaw = true;
+	Movement->bOrientRotationToMovement = false;
+	Movement->MaxWalkSpeed = WalkSpeed;
 }

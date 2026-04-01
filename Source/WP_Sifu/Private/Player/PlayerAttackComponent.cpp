@@ -16,6 +16,7 @@
 UPlayerAttackComponent::UPlayerAttackComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+	bWantsInitializeComponent = true;
 
 	Ext::SetObject(InputRun, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Run.IA_Run'"));
 	Ext::SetObject(InputLightAttack,
@@ -58,9 +59,9 @@ void UPlayerAttackComponent::OnInputHeavyAttack()
 	InputAction(GameplayTag::Combat_Input_Heavy);
 }
 
-void UPlayerAttackComponent::BeginPlay()
+void UPlayerAttackComponent::InitializeComponent()
 {
-	Super::BeginPlay();
+	Super::InitializeComponent();
 
 	CurrentStateTag = GameplayTag::Combat_State_Neutral;
 
