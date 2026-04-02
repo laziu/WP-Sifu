@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "CameraFocusComponent.h"
 
@@ -10,7 +10,7 @@
 UCameraFocusComponent::UCameraFocusComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	PrimaryComponentTick.bStartWithTickEnabled = false;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
 }
 
 void UCameraFocusComponent::BeginPlay()
@@ -23,49 +23,25 @@ void UCameraFocusComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// Release focusing if target is destroyed or out of range
-	if (!IsValid(TargetActor) ||
-		FVector::Dist(GetOwner()->GetActorLocation(), TargetActor->GetActorLocation()) > BreakDistance)
+	// Keep focusing if target is still valid and within range
+	if (IsValid(TargetActor) &&
+		FVector::Dist(GetOwner()->GetActorLocation(), TargetActor->GetActorLocation()) <= BreakDistance)
 	{
-		TargetActor = nullptr;
-		SetComponentTickEnabled(false);
+		UpdateRotationToTarget(DeltaTime);
 		return;
 	}
 
-	UpdateRotationToTarget(DeltaTime);
-}
-
-bool UCameraFocusComponent::Focus()
-{
-	// Find a new target
+	// Target gone or out of range — auto-scan for the nearest enemy
 	TargetActor = FindBestTarget();
 	if (TargetActor)
 	{
-		SetComponentTickEnabled(true);
-		return true;
+		UpdateRotationToTarget(DeltaTime);
 	}
-	return false;
 }
 
-bool UCameraFocusComponent::ReleaseFocus()
+void UCameraFocusComponent::SetFocusTarget(AActor* NewTarget)
 {
-	if (TargetActor)
-	{
-		TargetActor = nullptr;
-		SetComponentTickEnabled(false);
-		return true;
-	}
-	return false;
-}
-
-void UCameraFocusComponent::SwitchTarget(bool bToRight)
-{
-	if (!TargetActor) return;
-
-	if (AActor* BestCandidate = FindNextTarget(bToRight))
-	{
-		TargetActor = BestCandidate;
-	}
+	TargetActor = NewTarget;
 }
 
 FVector UCameraFocusComponent::GetFacingDirection() const
@@ -118,7 +94,6 @@ AActor* UCameraFocusComponent::FindBestTarget() const
 		ForwardDir = Owner->GetActorForwardVector();
 	}
 
-
 	// Find candidates in a sphere around the owner
 	TArray<AActor*> OverlapActors;
 	UKismetSystemLibrary::SphereOverlapActors(
@@ -147,57 +122,6 @@ AActor* UCameraFocusComponent::FindBestTarget() const
 		{
 			BestScore = Score;
 			BestCandidate = Candidate;
-		}
-	}
-
-	return BestCandidate;
-}
-
-AActor* UCameraFocusComponent::FindNextTarget(bool bToRight) const
-{
-	if (!TargetActor)
-	{
-		return FindBestTarget();
-	}
-
-	AActor* Owner = GetOwner();
-	if (!Owner) return nullptr;
-
-	const FVector OwnerLocation = Owner->GetActorLocation();
-
-	// Get a direction relative to the current target direction
-	const FVector ForwardDir = (TargetActor->GetActorLocation() - OwnerLocation).GetSafeNormal();
-	const FVector RightDir = FVector::CrossProduct(FVector::UpVector, ForwardDir).GetSafeNormal();
-
-	// Find candidates in a sphere around the owner
-	TArray<AActor*> OverlapActors;
-	UKismetSystemLibrary::SphereOverlapActors(
-		GetWorld(), OwnerLocation, FocusRadius, {}, AActor::StaticClass(), {Owner}, OverlapActors);
-
-	// Find the best candidate that is in the desired direction (left/right) and closest to the current target
-	AActor* BestCandidate = nullptr;
-	double BestScore = TNumericLimits<double>::Max();
-
-	for (AActor* Candidate : OverlapActors)
-	{
-		if (Candidate == TargetActor || Candidate == Owner) continue;
-		if (!Candidate->Implements<UAttackable>()) continue;
-
-		const FVector ToCandidate = Candidate->GetActorLocation() - OwnerLocation;
-		const FVector Direction = ToCandidate.GetSafeNormal();
-		const double Distance = ToCandidate.Size();
-		const double CosAngle = FVector::DotProduct(ForwardDir, Direction);
-		const double DotRight = FVector::DotProduct(RightDir, Direction);
-		if (Distance < 1e-4) continue;
-
-		if ((bToRight && DotRight > 0.05) || (!bToRight && DotRight < -0.05))
-		{
-			const double Score = Distance * (1. - CosAngle * 0.5);
-			if (Score < BestScore)
-			{
-				BestScore = Score;
-				BestCandidate = Candidate;
-			}
 		}
 	}
 
