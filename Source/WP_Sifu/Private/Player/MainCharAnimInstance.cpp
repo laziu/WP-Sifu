@@ -8,6 +8,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "KismetAnimationLibrary.h"
 #include "PlayerAttackComponent.h"
+#include "PlayerCombatInteractionComponent.h"
+#include "WP_Sifu.h"
 
 void UMainCharAnimInstance::NativeInitializeAnimation()
 {
@@ -43,6 +45,16 @@ void UMainCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		CurrentCombatStateTag = AttackComp->GetCurrentStateTag();
 		bIsAttacking = AttackComp->IsAttacking();
 	}
+
+	// Defence state
+	if (auto* CIC = Character->FindComponentByClass<UPlayerCombatInteractionComponent>())
+	{
+		DefenceState = CIC->GetDefenceState();
+		HitReactionType = CIC->HitReactionType;
+		HitDirection = CIC->HitDirection;
+	}
+
+	LOGW(TEXT("%s"), *UEnum::GetValueAsString(DefenceState));
 }
 
 FVector UMainCharAnimInstance::GetFacingDirection() const
