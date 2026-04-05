@@ -2,6 +2,7 @@
 
 #include "PlayerMoveComponent.h"
 
+#include "CameraFocusComponent.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "UserExtension.h"
@@ -11,7 +12,7 @@
 
 UPlayerMoveComponent::UPlayerMoveComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	Ext::SetObject(InputMove, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Move.IA_Move'"));
 	Ext::SetObject(InputLook, TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Look.IA_Look'"));
@@ -22,7 +23,6 @@ void UPlayerMoveComponent::OnRegister()
 {
 	Super::OnRegister();
 
-	// Character rotation: follow the camera/controller yaw instead of movement direction
 	auto Character = CastChecked<ACharacter>(GetOwner());
 	Character->bUseControllerRotationPitch = false;
 	Character->bUseControllerRotationYaw = true;
@@ -30,10 +30,21 @@ void UPlayerMoveComponent::OnRegister()
 
 	auto Movement = Character->GetCharacterMovement();
 	Movement->bOrientRotationToMovement = false;
-	Movement->MaxWalkSpeed = WalkSpeed;
+	Movement->MaxWalkSpeed = NormalSpeed;
 	Movement->RotationRate = FRotator(0., 540., 0.);
 	Movement->JumpZVelocity = 600.;
 	Movement->AirControl = 0.2;
+}
+
+void UPlayerMoveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                         FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (bInCombatStance && !bIsRunning)
+	{
+		UpdateCombatRotation(DeltaTime);
+	}
 }
 
 void UPlayerMoveComponent::SetupInputBindings(UEnhancedInputComponent* EIC)
@@ -43,6 +54,29 @@ void UPlayerMoveComponent::SetupInputBindings(UEnhancedInputComponent* EIC)
 	EIC->BindAction(InputRun, ETriggerEvent::Started, this, &UPlayerMoveComponent::OnInputRunStarted);
 	EIC->BindAction(InputRun, ETriggerEvent::Completed, this, &UPlayerMoveComponent::OnInputRunStopped);
 	EIC->BindAction(InputRun, ETriggerEvent::Canceled, this, &UPlayerMoveComponent::OnInputRunStopped);
+}
+
+void UPlayerMoveComponent::SetCombatStance(bool bNewCombatStance)
+{
+	if (bInCombatStance == bNewCombatStance) return;
+	bInCombatStance = bNewCombatStance;
+
+	if (bIsRunning) return; // Running overrides combat stance rotation
+
+	auto Character = CastChecked<ACharacter>(GetOwner());
+	if (bInCombatStance)
+	{
+		// Combat stance: disable controller rotation, rotate toward target in Tick
+		Character->bUseControllerRotationYaw = false;
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	}
+	else
+	{
+		// Normal: follow camera
+		Character->bUseControllerRotationYaw = true;
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	}
+	UpdateMovementSpeed();
 }
 
 void UPlayerMoveComponent::OnInputMove(const FInputActionValue& Value)
@@ -66,20 +100,68 @@ void UPlayerMoveComponent::OnInputLook(const FInputActionValue& Value)
 
 void UPlayerMoveComponent::OnInputRunStarted()
 {
-	const auto Character = CastChecked<ACharacter>(GetOwner());
-	const auto Movement = Character->GetCharacterMovement();
+	bIsRunning = true;
 
+	const auto Character = CastChecked<ACharacter>(GetOwner());
 	Character->bUseControllerRotationYaw = false;
-	Movement->bOrientRotationToMovement = true;
-	Movement->MaxWalkSpeed = RunSpeed;
+	Character->GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	UpdateMovementSpeed();
 }
 
 void UPlayerMoveComponent::OnInputRunStopped()
 {
-	const auto Character = CastChecked<ACharacter>(GetOwner());
-	const auto Movement = Character->GetCharacterMovement();
+	bIsRunning = false;
 
-	Character->bUseControllerRotationYaw = true;
-	Movement->bOrientRotationToMovement = false;
-	Movement->MaxWalkSpeed = WalkSpeed;
+	const auto Character = CastChecked<ACharacter>(GetOwner());
+
+	if (bInCombatStance)
+	{
+		// Return to combat stance rotation
+		Character->bUseControllerRotationYaw = false;
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	}
+	else
+	{
+		// Return to normal: follow camera
+		Character->bUseControllerRotationYaw = true;
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	}
+	UpdateMovementSpeed();
+}
+
+void UPlayerMoveComponent::UpdateMovementSpeed()
+{
+	const auto Character = CastChecked<ACharacter>(GetOwner());
+	auto* Movement = Character->GetCharacterMovement();
+
+	if (bIsRunning)
+	{
+		Movement->MaxWalkSpeed = RunSpeed;
+	}
+	else if (bInCombatStance)
+	{
+		Movement->MaxWalkSpeed = CombatSpeed;
+	}
+	else
+	{
+		Movement->MaxWalkSpeed = NormalSpeed;
+	}
+}
+
+void UPlayerMoveComponent::UpdateCombatRotation(float DeltaTime)
+{
+	auto* FocusComp = GetOwner()->FindComponentByClass<UCameraFocusComponent>();
+	if (!FocusComp || !FocusComp->IsLockedOn()) return;
+
+	const FVector FacingDir = FocusComp->GetFacingDirection();
+	if (FacingDir.IsNearlyZero()) return;
+
+	auto* Character = CastChecked<ACharacter>(GetOwner());
+	const FRotator CurrentRot = Character->GetActorRotation();
+	const FRotator TargetRot = FacingDir.Rotation();
+	const FRotator DesiredRot(CurrentRot.Pitch, TargetRot.Yaw, CurrentRot.Roll);
+
+	Character->SetActorRotation(
+		FMath::RInterpTo(CurrentRot, DesiredRot, DeltaTime, CombatRotationInterpSpeed));
 }

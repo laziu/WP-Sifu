@@ -3,6 +3,7 @@
 
 #include "PlayerCombatInteractionComponent.h"
 
+#include "CameraFocusComponent.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "UserExtension.h"
@@ -82,6 +83,15 @@ EAttackResponse UPlayerCombatInteractionComponent::ApplyDamage(const FAttackPayl
 				EGameplayModOp::Additive, Payload.StructureDamage);
 
 			SetHitReaction(EHitReactionType::BlockHit, Payload.ImpactLocation);
+
+			// Transfer camera focus to the attacker
+			if (Payload.Instigator.IsValid())
+			{
+				if (auto* FocusComp = GetOwner()->FindComponentByClass<UCameraFocusComponent>())
+				{
+					FocusComp->SetFocusTarget(Payload.Instigator.Get());
+				}
+			}
 
 			return EAttackResponse::Block;
 		}
@@ -324,4 +334,13 @@ void UPlayerCombatInteractionComponent::ApplyPendingHitDamage()
 		EGameplayModOp::Additive, Payload.StructureDamage);
 
 	SetHitReaction(EHitReactionType::Hit, Payload.ImpactLocation);
+
+	// Transfer camera focus to the attacker
+	if (Payload.Instigator.IsValid())
+	{
+		if (auto* FocusComp = GetOwner()->FindComponentByClass<UCameraFocusComponent>())
+		{
+			FocusComp->SetFocusTarget(Payload.Instigator.Get());
+		}
+	}
 }

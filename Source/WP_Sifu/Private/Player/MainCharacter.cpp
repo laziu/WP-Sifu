@@ -134,6 +134,15 @@ void AMainCharacter::PostInitializeComponents()
 	for (auto& Comp : AttackCollisions)
 	{
 		AttackCollisionManager->RegisterPersistentCollision(Comp);
+
+		// Transfer camera focus to an enemy when a hit lands on them
+		Comp->OnAttackHit.AddWeakLambda(this, [this](AActor* HitActor, const FHitResult&)
+		{
+			if (IsValid(HitActor) && HitActor->Implements<UAttackable>())
+			{
+				CameraFocus->SetFocusTarget(HitActor);
+			}
+		});
 	}
 }
 

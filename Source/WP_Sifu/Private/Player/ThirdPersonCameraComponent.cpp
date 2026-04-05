@@ -27,6 +27,7 @@ void UThirdPersonCameraComponent::OnRegister()
 	SpringArm = NewObject<USpringArmComponent>(Owner, TEXT("CameraSpringArm"));
 	SpringArm->SetupAttachment(Owner->GetRootComponent());
 	SpringArm->TargetArmLength = TargetArmLength;
+	SpringArm->TargetOffset = TargetOffset;
 	SpringArm->SocketOffset = SocketOffset;
 	SpringArm->bUsePawnControlRotation = true;
 	SpringArm->bEnableCameraLag = true;
