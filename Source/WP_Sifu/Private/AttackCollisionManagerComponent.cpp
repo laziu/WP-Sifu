@@ -5,7 +5,7 @@
 
 #include "AttackCollisionComponent.h"
 #include "CombatInteractionComponentBase.h"
-#include "PlayerAttackComponent.h"
+#include "GameplayTags.generated.h"
 #include "Weapon/WeaponBase.h"
 #include "WP_Sifu.h"
 #include "GameFramework/Character.h"
@@ -29,15 +29,10 @@ void UAttackCollisionManagerComponent::BeginPlay()
 	if (!Owner) return;
 
 	CombatComp = Owner->FindComponentByClass<UCombatInteractionComponentBase>();
-	AttackComp = Owner->FindComponentByClass<UPlayerAttackComponent>();
 
 	if (!CombatComp)
 	{
 		LOGW(TEXT("AttackCollisionManager: Owner에 CombatInteractionComponentBase가 없습니다."));
-	}
-	if (!AttackComp)
-	{
-		LOGW(TEXT("AttackCollisionManager: Owner에 PlayerAttackComponent가 없습니다."));
 	}
 }
 
@@ -82,12 +77,8 @@ UAttackCollisionComponent* UAttackCollisionManagerComponent::FindAttackCollision
 
 void UAttackCollisionManagerComponent::EquipWeapon(AWeaponBase* Weapon)
 {
-	if (!Weapon || !AttackComp) return;
+	if (!Weapon) return;
 	if (EquippedWeapon) UnequipWeapon();
-
-	// Backup the current unarmed attack table
-	DefaultAttackTable = AttackComp->GetDefaultAttackTable();
-	AttackComp->SetAttackTable(Weapon->AttackDefinitionTable);
 
 	// Attach the weapon to the character
 	auto* Character = Cast<ACharacter>(GetOwner());
@@ -111,13 +102,6 @@ void UAttackCollisionManagerComponent::EquipWeapon(AWeaponBase* Weapon)
 void UAttackCollisionManagerComponent::UnequipWeapon()
 {
 	if (!EquippedWeapon) return;
-
-	// Restore the unarmed attack table
-	if (AttackComp && DefaultAttackTable)
-	{
-		AttackComp->SetAttackTable(DefaultAttackTable);
-	}
-	DefaultAttackTable = nullptr;
 
 	// Unregister the weapon collision component
 	UAttackCollisionComponent* WeaponCollision = EquippedWeapon->AttackCollision;
@@ -144,10 +128,13 @@ void UAttackCollisionManagerComponent::UnequipWeapon()
 
 void UAttackCollisionManagerComponent::HandleHit(AActor* HitActor, const FHitResult& HitResult)
 {
-	if (!HitActor || !AttackComp || !CombatComp) return;
+	if (!HitActor || !CombatComp) return;
 
-	FAttackPayload Payload = AttackComp->MakeCurrentAttackPayload();
+	FAttackPayload Payload = CombatComp->MakeCurrentAttackPayload();
 	Payload.ImpactLocation = HitResult.ImpactPoint;
+	Payload.HealthDamage = 3; // default damage
+	Payload.StructureDamage = 3;
+	Payload.HitReaction = GameplayTag::Hit_Reaction_None;
 
 	CombatComp->SendAttack(HitActor, Payload);
 }

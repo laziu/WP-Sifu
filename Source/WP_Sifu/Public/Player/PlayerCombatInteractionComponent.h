@@ -27,6 +27,7 @@ public:
 	UPlayerCombatInteractionComponent();
 
 	virtual void SetupInputBindings(class UEnhancedInputComponent* EIC) override;
+	virtual FAttackPayload MakeCurrentAttackPayload() const override;
 
 public: /// --- Block input handlers ---
 	UFUNCTION(BlueprintCallable, Category=Combat)

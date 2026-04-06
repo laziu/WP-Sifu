@@ -51,6 +51,15 @@ void UPlayerCombatInteractionComponent::SetupInputBindings(UEnhancedInputCompone
 	EIC->BindAction(InputMove, ETriggerEvent::Started, this, &UPlayerCombatInteractionComponent::TryBlockDodge);
 }
 
+FAttackPayload UPlayerCombatInteractionComponent::MakeCurrentAttackPayload() const
+{
+	if (const auto* AttackComp = GetOwner()->FindComponentByClass<UPlayerAttackComponent>())
+	{
+		return AttackComp->MakeCurrentAttackPayload();
+	}
+	return Super::MakeCurrentAttackPayload();
+}
+
 void UPlayerCombatInteractionComponent::InitializeComponent()
 {
 	Super::InitializeComponent();

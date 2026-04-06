@@ -37,6 +37,11 @@ class WP_SIFU_API UCombatInteractionComponentBase : public UActorComponent
 	GENERATED_BODY()
 
 public: // --- Interactions ---
+	/// Build the attack payload for the current attack state.
+	/// Override in subclasses to provide specific damage/reaction data.
+	UFUNCTION(BlueprintCallable, Category=Combat)
+	virtual FAttackPayload MakeCurrentAttackPayload() const;
+
 	/// Receive attack; called from IAttackable::ReceiveAttack
 	UFUNCTION(BlueprintCallable, Category=Combat, meta=(ReturnDisplayName = "Response"))
 	EAttackResponse ProcessReceivedAttack(const FAttackPayload& Payload);
