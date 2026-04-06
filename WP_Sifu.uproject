@@ -20,6 +20,11 @@
 				"GameplayAbilities",
 				"AIModule"
 			]
+		},
+		{
+			"Name": "WP_SifuEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [

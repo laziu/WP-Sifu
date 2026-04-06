@@ -11,5 +11,6 @@ public class WP_SifuEditorTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V6;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_7;
 		ExtraModuleNames.Add("WP_Sifu");
+		ExtraModuleNames.Add("WP_SifuEditor");
 	}
 }
