@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "GameplayTagContainer.h"
+#include "CombatInteractionComponentBase.h"
+#include "PlayerCombatInteractionComponent.h"
 #include "MainCharAnimInstance.generated.h"
 
 /**
@@ -53,6 +55,17 @@ protected: // --- Combat ---
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat")
 	bool bIsAttacking = false;
+
+protected: // --- Defence ---
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat|Defence")
+	EDefenceState DefenceState = EDefenceState::None;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat|Defence")
+	EHitReactionType HitReactionType = EHitReactionType::None;
+
+	/// Hit direction in character-local space (X=Right, Y=Forward) for blend space
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat|Defence")
+	FVector2D HitDirection = FVector2D::ZeroVector;
 
 	UFUNCTION(BlueprintPure, Category="Camera")
 	FVector GetFacingDirection() const;

@@ -59,7 +59,7 @@ public: // --- AnimNotify Function ---
 	void CloseTransitionWindow(FGameplayTag InputTag);
 
 protected:
-	virtual void BeginPlay() override;
+	virtual void InitializeComponent() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
 	TObjectPtr<class UInputAction> InputRun;
@@ -76,7 +76,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Attack)
 	TObjectPtr<UDataTable> AttackDefinitionTable;
 
-	/// Default table configured in the editor, initialized in BeginPlay for restore.
+	/// Default table configured in the editor, initialized once for restore.
 	UPROPERTY()
 	TObjectPtr<UDataTable> DefaultAttackDefinitionTable;
 
@@ -89,7 +89,7 @@ private:
 	/// Attack definition lookup: state tag -> row
 	TMap<FGameplayTag, const struct FPlayerAttackDefinitionRow*> AttackDefinitionLookup;
 
-	/// Preloaded montages: State → Montage (populated at BeginPlay)
+	/// Preloaded montages: State -> Montage
 	TMap<FGameplayTag, TObjectPtr<class UAnimMontage>> MontageCache;
 
 	/// Currently playing montage (nullptr when not attacking)

@@ -21,8 +21,8 @@ public:
 	AMainCharacter();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	// Called when components have been initialized
+	virtual void PostInitializeComponents() override;
 
 public:
 	// AbilitySystemInterface

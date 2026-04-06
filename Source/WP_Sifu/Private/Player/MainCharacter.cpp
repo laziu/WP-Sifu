@@ -21,8 +21,7 @@
 // Sets default values
 AMainCharacter::AMainCharacter()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	// Set mesh
 	if (auto TempMesh = Ext::OpenObject<USkeletalMesh>(TEXT(
@@ -124,10 +123,9 @@ AMainCharacter::AMainCharacter()
 	HealthAttributes->InitMaxStructure(MaxStructure);
 }
 
-// Called when the game starts or when spawned
-void AMainCharacter::BeginPlay()
+void AMainCharacter::PostInitializeComponents()
 {
-	Super::BeginPlay();
+	Super::PostInitializeComponents();
 
 	// Setup owner for ability system component
 	AbilitySystem->InitAbilityActorInfo(this, this);
@@ -136,6 +134,15 @@ void AMainCharacter::BeginPlay()
 	for (auto& Comp : AttackCollisions)
 	{
 		AttackCollisionManager->RegisterPersistentCollision(Comp);
+
+		// Transfer camera focus to an enemy when a hit lands on them
+		Comp->OnAttackHit.AddWeakLambda(this, [this](AActor* HitActor, const FHitResult&)
+		{
+			if (IsValid(HitActor) && HitActor->Implements<UAttackable>())
+			{
+				CameraFocus->SetFocusTarget(HitActor);
+			}
+		});
 	}
 }
 

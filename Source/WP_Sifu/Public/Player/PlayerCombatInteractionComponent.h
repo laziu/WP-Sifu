@@ -4,8 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "CombatInteractionComponentBase.h"
+#include "GameplayTagContainer.h"
 #include "InputBindable.h"
 #include "PlayerCombatInteractionComponent.generated.h"
+
+
+UENUM(BlueprintType)
+enum class EHitReactionType : uint8
+{
+	None UMETA(DisplayName="None"),
+	Hit UMETA(DisplayName="Hit"),
+	BlockHit UMETA(DisplayName="BlockHit"),
+};
 
 
 UCLASS(ClassGroup=(Combat), meta=(BlueprintSpawnableComponent))
@@ -25,6 +35,22 @@ public: /// --- Block input handlers ---
 	UFUNCTION(BlueprintCallable, Category=Combat)
 	void StopBlock();
 
+public: /// --- AnimNotify callbacks (called by AnimNotify classes) ---
+	void OnParryWindowBegin();
+	void OnParryWindowEnd();
+	void OnDodgeActiveBegin();
+	void OnDodgeActiveEnd();
+	void OnDodgeCooldownEnd();
+	void OnHitReactionEnd();
+
+public: /// --- ABP-readable state ---
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Animation)
+	EHitReactionType HitReactionType = EHitReactionType::None;
+
+	/// Hit direction in character-local space (X=Right, Y=Forward) for blend space
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Animation)
+	FVector2D HitDirection = FVector2D::ZeroVector;
+
 protected:
 	// Called when the component is initialized
 	virtual void InitializeComponent() override;
@@ -34,6 +60,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
 	TObjectPtr<class UInputAction> InputBlock;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
+	TObjectPtr<class UInputAction> InputMove;
 
 private:
 	/// Check hit direction based on ImpactLocation and player's forward vector
@@ -46,12 +75,41 @@ private:
 	TObjectPtr<class UAbilitySystemComponent> AbilitySystemComp;
 
 private: // --- Parry/Block ---
-	FTimerHandle ParryTimerHandle;
-
-	UPROPERTY(EditDefaultsOnly, Category=Combat)
-	float ParryWindowDuration = 0.15f;
-
 	bool bBlockKeyHeld = false;
 
-	void OnParryWindowExpired();
+	FVector2D ComputeHitDirection(const FVector& ImpactLocation) const;
+	void SetHitReaction(EHitReactionType Type, const FVector& ImpactLocation);
+
+private: // --- Montages ---
+	UPROPERTY(EditDefaultsOnly, Category=Animation)
+	TObjectPtr<class UAnimMontage> BlockStartMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category=Animation)
+	TObjectPtr<class UAnimMontage> DodgeUpMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category=Animation)
+	TObjectPtr<class UAnimMontage> DodgeDownMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category=Animation)
+	TObjectPtr<class UAnimMontage> HitMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category=Animation)
+	TObjectPtr<class UAnimMontage> BlockHitMontage;
+
+	bool PlayDefenceMontage(class UAnimMontage* Montage);
+
+private: // --- Dodge ---
+	bool bCanDodge = true;
+
+	void TryBlockDodge(const struct FInputActionValue& Value);
+	void ExecuteBlockDodge(FGameplayTag DodgeStateTag);
+
+private: // --- Late Input Buffer ---
+	UPROPERTY(EditDefaultsOnly, Category=Input, meta=(ClampMin="0"))
+	float LateInputWindow = 0.1f;
+
+	TOptional<FAttackPayload> PendingHitPayload;
+	FTimerHandle PendingHitTimer;
+
+	void ApplyPendingHitDamage();
 };

@@ -32,10 +32,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Camera)
 	double TargetArmLength = 120.;
 
-	/// Socket offset for over-the-shoulder view
+	/// Target offset (looks at character head height)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Camera)
-	FVector SocketOffset = FVector(0., 60., 60.);
+	FVector TargetOffset = FVector(0., 0., 80.);
+
+	/// Initial socket offset for over-the-shoulder view
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Camera)
+	FVector SocketOffset = FVector(0., 60., 0.);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Camera)
-	double CameraLagSpeed = 10.;
+	double CameraLagSpeed = 4.;
 };
