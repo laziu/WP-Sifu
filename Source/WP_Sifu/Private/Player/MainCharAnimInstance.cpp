@@ -54,7 +54,7 @@ void UMainCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		HitDirection = CIC->HitDirection;
 	}
 
-	LOGW(TEXT("%s"), *UEnum::GetValueAsString(DefenceState));
+	// LOGW(TEXT("%s"), *UEnum::GetValueAsString(DefenceState));
 }
 
 FVector UMainCharAnimInstance::GetFacingDirection() const
