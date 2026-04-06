@@ -100,7 +100,10 @@ private: // --- Montages ---
 	bool PlayDefenceMontage(class UAnimMontage* Montage);
 
 private: // --- Dodge ---
+	static constexpr float DodgeCooldown = 0.15f;
+
 	bool bCanDodge = true;
+	FTimerHandle DodgeCooldownTimer;
 
 	void TryBlockDodge(const struct FInputActionValue& Value);
 	void ExecuteBlockDodge(FGameplayTag DodgeStateTag);
