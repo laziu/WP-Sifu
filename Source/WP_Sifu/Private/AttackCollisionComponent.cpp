@@ -51,7 +51,7 @@ void UAttackCollisionComponent::ApplyCollisionMesh()
 	CollisionMeshComp->SetGenerateOverlapEvents(false);
 	CollisionMeshComp->SetCollisionObjectType(TraceChannel);
 	CollisionMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	CollisionMeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+	CollisionMeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
 void UAttackCollisionComponent::ApplyEditorVisibility()
