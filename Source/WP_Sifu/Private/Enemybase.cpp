@@ -7,7 +7,7 @@
 #include "HealthAttributeSet.h"
 #include "UserExtension.h"
 #include "Components/BoxComponent.h"
-#include "Components/SphereComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -29,7 +29,9 @@ AEnemybase::AEnemybase()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 
-	//GetMesh()->SetCollisionProfileName("")
+	// Spring arm이 적을 통과하도록 Camera 채널 무시
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 	// Ability system
 	EXT_CREATE_DEFAULT_SUBOBJECT(AbilitySystem);
