@@ -49,8 +49,8 @@ public:
 	TObjectPtr<class UDummyCombatInteractionComponent> CombatInteractionComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attributes)
-	float MaxHealth = 100.f;
+	float MaxHealth = 50.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attributes)
-	float MaxStructure = 100.f;
+	float MaxStructure = 50.f;
 };
