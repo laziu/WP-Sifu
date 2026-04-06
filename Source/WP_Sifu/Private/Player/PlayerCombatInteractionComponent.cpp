@@ -51,6 +51,15 @@ void UPlayerCombatInteractionComponent::SetupInputBindings(UEnhancedInputCompone
 	EIC->BindAction(InputMove, ETriggerEvent::Started, this, &UPlayerCombatInteractionComponent::TryBlockDodge);
 }
 
+FAttackPayload UPlayerCombatInteractionComponent::MakeCurrentAttackPayload() const
+{
+	if (const auto* AttackComp = GetOwner()->FindComponentByClass<UPlayerAttackComponent>())
+	{
+		return AttackComp->MakeCurrentAttackPayload();
+	}
+	return Super::MakeCurrentAttackPayload();
+}
+
 void UPlayerCombatInteractionComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
@@ -216,6 +225,7 @@ void UPlayerCombatInteractionComponent::OnDodgeActiveEnd()
 
 void UPlayerCombatInteractionComponent::OnDodgeCooldownEnd()
 {
+	// 타이머 기반으로 전환됨 — AnimNotify 호환용으로 유지
 	bCanDodge = true;
 }
 
@@ -256,8 +266,18 @@ void UPlayerCombatInteractionComponent::ExecuteBlockDodge(FGameplayTag DodgeStat
 	if (!PlayDefenceMontage(Montage))
 	{
 		bCanDodge = true;
+		GetWorld()->GetTimerManager().ClearTimer(DodgeCooldownTimer);
 		SetDefenceState(bBlockKeyHeld ? EDefenceState::Blocking : EDefenceState::None);
+		return;
 	}
+
+	// AnimNotify 대신 타이머로 쿨다운 관리 (몽타주 중단 시에도 확실히 복구)
+	GetWorld()->GetTimerManager().SetTimer(
+		DodgeCooldownTimer, FTimerDelegate::CreateWeakLambda(this, [this]()
+		{
+			bCanDodge = true;
+		}),
+		DodgeCooldown, false);
 }
 
 // ── Hit Reaction ─────────────────────────────────────────────

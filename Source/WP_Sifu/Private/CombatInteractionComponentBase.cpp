@@ -6,6 +6,14 @@
 #include "Kismet/GameplayStatics.h"
 
 
+FAttackPayload UCombatInteractionComponentBase::MakeCurrentAttackPayload() const
+{
+	FAttackPayload Payload;
+	Payload.Instigator = GetOwner();
+	return Payload;
+}
+
+
 EAttackResponse UCombatInteractionComponentBase::ProcessReceivedAttack(const FAttackPayload& Payload)
 {
 	if (DefenceState == EDefenceState::Invincible)

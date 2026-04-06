@@ -27,6 +27,7 @@ public: // --- Public Methods ---
 
 	/// Registers unarmed collision components (hands/feet) by AttackTag.
 	/// Called for each component from AMainCharacter::BeginPlay.
+	UFUNCTION(BlueprintCallable, Category=Combat)
 	void RegisterPersistentCollision(class UAttackCollisionComponent* Comp);
 
 	UFUNCTION(BlueprintCallable, Category=Weapon)
@@ -45,16 +46,9 @@ private: // --- External References (cached in BeginPlay) ---
 	UPROPERTY()
 	TObjectPtr<class UCombatInteractionComponentBase> CombatComp;
 
-	UPROPERTY()
-	TObjectPtr<class UPlayerAttackComponent> AttackComp;
-
 private: // --- State ---
 	UPROPERTY()
 	TObjectPtr<class AWeaponBase> EquippedWeapon;
-
-	/// Backup of AttackDefinitionTable before equipping a weapon, used on unequip.
-	UPROPERTY()
-	TObjectPtr<class UDataTable> DefaultAttackTable;
 
 	/// AttackTag -> currently active UAttackCollisionComponent
 	UPROPERTY()
