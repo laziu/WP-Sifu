@@ -25,6 +25,10 @@ void UHealthAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribut
 	if (Attribute == GetHealthAttribute())
 	{
 		OnHealthChanged.Broadcast(this, OldValue, NewValue);
+		if (NewValue <= 0.f && OldValue > 0.f)
+		{
+			OnHealthDepleted.Broadcast();
+		}
 	}
 	else if (Attribute == GetMaxHealthAttribute())
 	{

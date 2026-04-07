@@ -4,6 +4,7 @@
 #include "PlayerCombatInteractionComponent.h"
 
 #include "CameraFocusComponent.h"
+#include "DeathHandlerComponentBase.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "UserExtension.h"
@@ -352,6 +353,12 @@ void UPlayerCombatInteractionComponent::ApplyPendingHitDamage()
 	AbilitySystemComp->ApplyModToAttribute(
 		UHealthAttributeSet::GetStructureAttribute(),
 		EGameplayModOp::Additive, Payload.StructureDamage);
+
+	// Skip hit reaction if the damage killed the character
+	if (auto* DeathComp = GetOwner()->FindComponentByClass<UDeathHandlerComponentBase>())
+	{
+		if (DeathComp->IsDead()) return;
+	}
 
 	SetHitReaction(EHitReactionType::Hit, Payload.ImpactLocation);
 

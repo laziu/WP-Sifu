@@ -13,6 +13,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(
 	FAttributeChangedEvent,
 	UAttributeSet*, AttributeSet, float, OldValue, float, NewValue);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHealthDepleted);
+
 
 /**
  * 
@@ -54,4 +56,7 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FAttributeChangedEvent OnStructureChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnHealthDepleted OnHealthDepleted;
 };

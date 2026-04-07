@@ -2,6 +2,7 @@
 
 
 #include "CombatInteractionComponentBase.h"
+#include "DeathHandlerComponentBase.h"
 #include "WP_Sifu.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -16,6 +17,12 @@ FAttackPayload UCombatInteractionComponentBase::MakeCurrentAttackPayload() const
 
 EAttackResponse UCombatInteractionComponentBase::ProcessReceivedAttack(const FAttackPayload& Payload)
 {
+	// Ignore damage if already dead
+	if (auto* DeathComp = GetOwner()->FindComponentByClass<UDeathHandlerComponentBase>())
+	{
+		if (DeathComp->IsDead()) return EAttackResponse::Ignore;
+	}
+
 	if (DefenceState == EDefenceState::Invincible)
 	{
 		return EAttackResponse::Ignore;

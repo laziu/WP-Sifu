@@ -4,6 +4,7 @@
 #include "MainCharAnimInstance.h"
 
 #include "CameraFocusComponent.h"
+#include "DeathHandlerComponentBase.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "KismetAnimationLibrary.h"
@@ -52,6 +53,12 @@ void UMainCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		DefenceState = CIC->GetDefenceState();
 		HitReactionType = CIC->HitReactionType;
 		HitDirection = CIC->HitDirection;
+	}
+
+	// Death state
+	if (auto* DeathComp = Character->FindComponentByClass<UDeathHandlerComponentBase>())
+	{
+		bIsDead = DeathComp->IsDead();
 	}
 
 	// LOGW(TEXT("%s"), *UEnum::GetValueAsString(DefenceState));

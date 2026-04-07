@@ -8,6 +8,8 @@
 #include "GameFramework/Character.h"
 #include "Enemybase.generated.h"
 
+class UEnemyDeathHandlerComponent;
+
 UCLASS()
 class WP_SIFU_API AEnemybase :
 	public ACharacter,
@@ -48,9 +50,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
 	TObjectPtr<class UDummyCombatInteractionComponent> CombatInteractionComp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attributes)
-	float MaxHealth = 50.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Death)
+	TObjectPtr<UEnemyDeathHandlerComponent> DeathHandler;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attributes)
-	float MaxStructure = 50.f;
+	float MaxHealth = 10.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Attributes)
+	float MaxStructure = 20.f;
 };

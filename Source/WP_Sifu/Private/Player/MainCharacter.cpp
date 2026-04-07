@@ -12,6 +12,7 @@
 #include "PlayerCombatInteractionComponent.h"
 #include "AttackCollisionComponent.h"
 #include "AttackCollisionManagerComponent.h"
+#include "PlayerDeathHandlerComponent.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UserExtension.h"
@@ -49,6 +50,7 @@ AMainCharacter::AMainCharacter()
 	EXT_CREATE_DEFAULT_SUBOBJECT(PlayerCombatInteraction, TEXT("CombatInteractionSystem"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(PlayerAttack, TEXT("AttackSystem"));
 	EXT_CREATE_DEFAULT_SUBOBJECT(AttackCollisionManager, TEXT("AttackCollisionManager"));
+	EXT_CREATE_DEFAULT_SUBOBJECT(PlayerDeathHandler, TEXT("DeathHandler"));
 
 	// Unarmed hand/foot collision components (attached to skeletal mesh sockets)
 	struct _FCompConfig

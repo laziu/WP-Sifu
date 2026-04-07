@@ -4,6 +4,7 @@
 #include "Enemybase.h"
 
 #include "DummyCombatInteractionComponent.h"
+#include "EnemyDeathHandlerComponent.h"
 #include "HealthAttributeSet.h"
 #include "UserExtension.h"
 #include "Components/BoxComponent.h"
@@ -37,6 +38,7 @@ AEnemybase::AEnemybase()
 	EXT_CREATE_DEFAULT_SUBOBJECT(AbilitySystem);
 	EXT_CREATE_DEFAULT_SUBOBJECT(HealthAttributes);
 	EXT_CREATE_DEFAULT_SUBOBJECT(CombatInteractionComp);
+	EXT_CREATE_DEFAULT_SUBOBJECT(DeathHandler);
 
 	// Initialize attributes
 	HealthAttributes->InitHealth(MaxHealth);

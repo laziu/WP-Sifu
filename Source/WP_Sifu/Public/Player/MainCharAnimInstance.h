@@ -67,6 +67,10 @@ protected: // --- Defence ---
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat|Defence")
 	FVector2D HitDirection = FVector2D::ZeroVector;
 
+protected: // --- Death ---
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat|Death")
+	bool bIsDead = false;
+
 	UFUNCTION(BlueprintPure, Category="Camera")
 	FVector GetFacingDirection() const;
 };
