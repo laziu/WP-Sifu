@@ -3,7 +3,7 @@
 
 #include "Enemybase.h"
 
-#include "DummyCombatInteractionComponent.h"
+#include "EnemyCombatInteractionComponent.h"
 #include "EnemyDeathHandlerComponent.h"
 #include "HealthAttributeSet.h"
 #include "UserExtension.h"

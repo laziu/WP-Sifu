@@ -5,7 +5,6 @@
 
 #include "UserExtension.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/StateTreeComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AIController.h"
@@ -22,13 +21,10 @@ void UEnemyDeathHandlerComponent::OnDeathBegin()
 {
 	if (auto* Character = Cast<ACharacter>(GetOwner()))
 	{
-		// Stop AI behavior immediately
+		// Release the pawn from its AI controller as soon as death starts.
 		if (auto* AIC = Cast<AAIController>(Character->GetController()))
 		{
-			if (auto* STC = AIC->FindComponentByClass<UStateTreeComponent>())
-			{
-				STC->StopLogic(TEXT("Dead"));
-			}
+			AIC->UnPossess();
 		}
 
 		// Stop all movement

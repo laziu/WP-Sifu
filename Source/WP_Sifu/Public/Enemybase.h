@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Enemybase.generated.h"
 
+class UEnemyCombatInteractionComponent;
 class UEnemyDeathHandlerComponent;
 
 UCLASS()
@@ -48,7 +49,7 @@ public:
 	TObjectPtr<class UHealthAttributeSet> HealthAttributes;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
-	TObjectPtr<class UDummyCombatInteractionComponent> CombatInteractionComp;
+	TObjectPtr<UEnemyCombatInteractionComponent> CombatInteractionComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Death)
 	TObjectPtr<UEnemyDeathHandlerComponent> DeathHandler;
