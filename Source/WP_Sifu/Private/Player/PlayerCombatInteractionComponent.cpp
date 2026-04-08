@@ -69,6 +69,30 @@ void UPlayerCombatInteractionComponent::InitializeComponent()
 	AbilitySystemComp = ASI->GetAbilitySystemComponent();
 }
 
+void UPlayerCombatInteractionComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (auto* DeathComp = GetOwner()->FindComponentByClass<UDeathHandlerComponentBase>())
+	{
+		DeathComp->OnDeathStarted.AddDynamic(this, &UPlayerCombatInteractionComponent::ResetCombatState);
+	}
+}
+
+void UPlayerCombatInteractionComponent::ResetCombatState()
+{
+	SetDefenceState(EDefenceState::None);
+	bBlockKeyHeld = false;
+	bHitRecoveryMovementLock = false;
+	HitReactionType = EHitReactionType::None;
+	HitDirection = FVector2D::ZeroVector;
+	PendingHitPayload.Reset();
+	GetWorld()->GetTimerManager().ClearTimer(PendingHitTimer);
+	GetWorld()->GetTimerManager().ClearTimer(HitRecoveryTimer);
+	GetWorld()->GetTimerManager().ClearTimer(DodgeCooldownTimer);
+	bCanDodge = true;
+}
+
 EAttackResponse UPlayerCombatInteractionComponent::ApplyDamage(const FAttackPayload& Payload)
 {
 	switch (DefenceState)
@@ -304,6 +328,16 @@ void UPlayerCombatInteractionComponent::SetHitReaction(EHitReactionType Type, co
 {
 	HitReactionType = Type;
 	HitDirection = ComputeHitDirection(ImpactLocation);
+	if (Type == EHitReactionType::Hit)
+	{
+		bHitRecoveryMovementLock = true;
+		GetWorld()->GetTimerManager().SetTimer(
+			HitRecoveryTimer, FTimerDelegate::CreateWeakLambda(this, [this]()
+			{
+				bHitRecoveryMovementLock = false;
+			}),
+			HitRecoveryLockDuration, false);
+	}
 
 	UAnimMontage* Montage = (Type == EHitReactionType::BlockHit)
 		                        ? BlockHitMontage.Get()
@@ -316,6 +350,11 @@ void UPlayerCombatInteractionComponent::OnHitReactionEnd()
 {
 	HitReactionType = EHitReactionType::None;
 	HitDirection = FVector2D::ZeroVector;
+}
+
+bool UPlayerCombatInteractionComponent::IsMovementBlocked() const
+{
+	return DefenceState == EDefenceState::Blocking || bHitRecoveryMovementLock;
 }
 
 // ── Montage Helper ──────────────────────────────────────────

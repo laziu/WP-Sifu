@@ -5,6 +5,7 @@
 #include "CameraFocusComponent.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
+#include "PlayerCombatInteractionComponent.h"
 #include "UserExtension.h"
 #include "WP_Sifu.h"
 #include "GameFramework/Character.h"
@@ -81,6 +82,12 @@ void UPlayerMoveComponent::SetCombatStance(bool bNewCombatStance)
 
 void UPlayerMoveComponent::OnInputMove(const FInputActionValue& Value)
 {
+	if (auto* CIC = GetOwner()->FindComponentByClass<UPlayerCombatInteractionComponent>())
+	{
+		if (CIC->IsMovementBlocked())
+			return;
+	}
+
 	const auto Input = Value.Get<FVector2D>();
 
 	const auto Character = CastChecked<ACharacter>(GetOwner());

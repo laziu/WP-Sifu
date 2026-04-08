@@ -44,6 +44,10 @@ public: /// --- AnimNotify callbacks (called by AnimNotify classes) ---
 	void OnDodgeCooldownEnd();
 	void OnHitReactionEnd();
 
+public: /// --- Movement blocking ---
+	UFUNCTION(BlueprintPure, Category=Combat)
+	bool IsMovementBlocked() const;
+
 public: /// --- ABP-readable state ---
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Animation)
 	EHitReactionType HitReactionType = EHitReactionType::None;
@@ -53,10 +57,9 @@ public: /// --- ABP-readable state ---
 	FVector2D HitDirection = FVector2D::ZeroVector;
 
 protected:
-	// Called when the component is initialized
 	virtual void InitializeComponent() override;
+	virtual void BeginPlay() override;
 
-	// Core logic implementation
 	virtual EAttackResponse ApplyDamage(const FAttackPayload& Payload) override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category=Input)
@@ -77,6 +80,9 @@ private:
 
 private: // --- Parry/Block ---
 	bool bBlockKeyHeld = false;
+	bool bHitRecoveryMovementLock = false;
+	FTimerHandle HitRecoveryTimer;
+	static constexpr float HitRecoveryLockDuration = 0.2f;
 
 	FVector2D ComputeHitDirection(const FVector& ImpactLocation) const;
 	void SetHitReaction(EHitReactionType Type, const FVector& ImpactLocation);
@@ -116,4 +122,8 @@ private: // --- Late Input Buffer ---
 	FTimerHandle PendingHitTimer;
 
 	void ApplyPendingHitDamage();
+
+private:
+	UFUNCTION()
+	void ResetCombatState();
 };

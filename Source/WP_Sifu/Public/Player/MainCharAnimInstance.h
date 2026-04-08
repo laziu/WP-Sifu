@@ -49,6 +49,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	bool bIsFalling;
 
+	/// Whether the character is currently in combat stance (enemies nearby / locked on)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
+	bool bInCombatStance;
+
+	/// Attack ready state: in combat stance, not attacking, not running, not falling
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
+	bool bIsAttackReady;
+
 protected: // --- Combat ---
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Combat")
 	FGameplayTag CurrentCombatStateTag;

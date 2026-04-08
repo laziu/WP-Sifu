@@ -3,6 +3,7 @@
 #include "CameraFocusComponent.h"
 
 #include "Attackable.h"
+#include "DeathHandlerComponentBase.h"
 #include "ThirdPersonCameraComponent.h"
 #include "PlayerAttackComponent.h"
 #include "PlayerMoveComponent.h"
@@ -56,9 +57,17 @@ void UCameraFocusComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 		DrawDebugSphere(GetWorld(), TargetActor->GetActorLocation(), 40.f, 12, FColor::Red, false, -1.f, 0, 2.f);
 	}
 
-	// Keep target if still valid and within range, otherwise auto-scan
-	if (!(IsValid(TargetActor) &&
-		FVector::Dist(GetOwner()->GetActorLocation(), TargetActor->GetActorLocation()) <= FocusRadius))
+	// Keep target if still valid, alive, and within range; otherwise auto-scan
+	bool bTargetValid = IsValid(TargetActor) &&
+		FVector::Dist(GetOwner()->GetActorLocation(), TargetActor->GetActorLocation()) <= FocusRadius;
+	if (bTargetValid)
+	{
+		if (auto* DeathComp = TargetActor->FindComponentByClass<UDeathHandlerComponentBase>())
+		{
+			if (DeathComp->IsDead()) bTargetValid = false;
+		}
+	}
+	if (!bTargetValid)
 	{
 		TargetActor = FindBestTarget();
 	}
@@ -84,6 +93,13 @@ void UCameraFocusComponent::SetFocusTarget(AActor* NewTarget)
 	if (NewTarget && (NewTarget == GetOwner() || !NewTarget->Implements<UAttackable>()))
 	{
 		return;
+	}
+	if (NewTarget)
+	{
+		if (auto* DeathComp = NewTarget->FindComponentByClass<UDeathHandlerComponentBase>())
+		{
+			if (DeathComp->IsDead()) return;
+		}
 	}
 	TargetActor = NewTarget;
 }
@@ -145,12 +161,16 @@ AActor* UCameraFocusComponent::FindBestTarget() const
 	for (AActor* Candidate : OverlapActors)
 	{
 		if (!Candidate->Implements<UAttackable>()) continue;
+		if (auto* DeathComp = Candidate->FindComponentByClass<UDeathHandlerComponentBase>())
+		{
+			if (DeathComp->IsDead()) continue;
+		}
 
 		const FVector ToCandidate = Candidate->GetActorLocation() - OwnerLocation;
 		const FVector Direction = ToCandidate.GetSafeNormal();
 		const double Distance = ToCandidate.Size();
 		const double CosAngle = FVector::DotProduct(ForwardDir, Direction);
-		if (Distance < 1e-4) continue;
+		if (Distance < 1e-4 || Distance > FocusRadius) continue;
 		if (CosAngle < CosAngleThreshold) continue;
 
 		const double Score = Distance * (1. - CosAngle * 0.5);
@@ -204,6 +224,10 @@ TArray<AActor*> UCameraFocusComponent::FindNearbyEnemies() const
 	{
 		if (Actor->Implements<UAttackable>())
 		{
+			if (auto* DeathComp = Actor->FindComponentByClass<UDeathHandlerComponentBase>())
+			{
+				if (DeathComp->IsDead()) continue;
+			}
 			Enemies.Add(Actor);
 		}
 	}
@@ -333,6 +357,8 @@ void UCameraFocusComponent::UpdateZoom(const TArray<AActor*>& NearbyEnemies, flo
 			+ NearbyEnemies.Num() * PerEnemyZoomOut
 			+ MaxDist * SpreadZoomFactor;
 	}
+
+	DesiredArmLength = FMath::Clamp(DesiredArmLength, BaseArmLength, BaseArmLength * 2.0);
 
 	// --- Smooth damp (critically-damped spring) ---
 	// Naturally produces ease-in / ease-out.  ZoomMaxSpeed caps peak velocity.

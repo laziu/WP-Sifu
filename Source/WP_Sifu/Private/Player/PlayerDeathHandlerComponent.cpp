@@ -117,6 +117,11 @@ void UPlayerDeathHandlerComponent::RestoreHealth()
 				ASC->SetNumericAttributeBase(
 					UHealthAttributeSet::GetHealthAttribute(),
 					HealthAttr->GetMaxHealth());
+
+				// Reset structure to 0 on revive
+				ASC->SetNumericAttributeBase(
+					UHealthAttributeSet::GetStructureAttribute(),
+					0.f);
 			}
 		}
 	}
