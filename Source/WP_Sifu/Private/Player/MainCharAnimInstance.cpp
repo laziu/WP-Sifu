@@ -10,6 +10,7 @@
 #include "KismetAnimationLibrary.h"
 #include "PlayerAttackComponent.h"
 #include "PlayerCombatInteractionComponent.h"
+#include "PlayerMoveComponent.h"
 #include "WP_Sifu.h"
 
 void UMainCharAnimInstance::NativeInitializeAnimation()
@@ -60,6 +61,13 @@ void UMainCharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		bIsDead = DeathComp->IsDead();
 	}
+
+	// Combat stance & attack ready
+	if (auto* MoveComp = Character->FindComponentByClass<UPlayerMoveComponent>())
+	{
+		bInCombatStance = MoveComp->IsInCombatStance();
+	}
+	bIsAttackReady = bInCombatStance && !bIsAttacking && !bIsFalling;
 
 	// LOGW(TEXT("%s"), *UEnum::GetValueAsString(DefenceState));
 }
