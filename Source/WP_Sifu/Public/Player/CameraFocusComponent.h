@@ -57,7 +57,7 @@ protected: // --- Input ---
 
 protected: // --- Focus Config ---
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Focus)
-	double FocusRadius = 1500.;
+	double FocusRadius = 500.;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Focus)
 	double FocusAngle = 90.;

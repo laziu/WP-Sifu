@@ -3,6 +3,7 @@
 #include "CameraFocusComponent.h"
 
 #include "Attackable.h"
+#include "DeathHandlerComponentBase.h"
 #include "ThirdPersonCameraComponent.h"
 #include "PlayerAttackComponent.h"
 #include "PlayerMoveComponent.h"
@@ -169,7 +170,7 @@ AActor* UCameraFocusComponent::FindBestTarget() const
 		const FVector Direction = ToCandidate.GetSafeNormal();
 		const double Distance = ToCandidate.Size();
 		const double CosAngle = FVector::DotProduct(ForwardDir, Direction);
-		if (Distance < 1e-4) continue;
+		if (Distance < 1e-4 || Distance > FocusRadius) continue;
 		if (CosAngle < CosAngleThreshold) continue;
 
 		const double Score = Distance * (1. - CosAngle * 0.5);
@@ -356,6 +357,8 @@ void UCameraFocusComponent::UpdateZoom(const TArray<AActor*>& NearbyEnemies, flo
 			+ NearbyEnemies.Num() * PerEnemyZoomOut
 			+ MaxDist * SpreadZoomFactor;
 	}
+
+	DesiredArmLength = FMath::Clamp(DesiredArmLength, BaseArmLength, BaseArmLength * 2.0);
 
 	// --- Smooth damp (critically-damped spring) ---
 	// Naturally produces ease-in / ease-out.  ZoomMaxSpeed caps peak velocity.
