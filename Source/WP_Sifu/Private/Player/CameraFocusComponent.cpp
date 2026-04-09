@@ -54,7 +54,8 @@ void UCameraFocusComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	// Debug: draw red sphere at focused target
 	if (IsValid(TargetActor))
 	{
-		DrawDebugSphere(GetWorld(), TargetActor->GetActorLocation(), 40.f, 12, FColor::Red, false, -1.f, 0, 2.f);
+		const FVector HeadPos = TargetActor->GetActorLocation() + FVector(0.f, 0.f, 100.f);
+		DrawDebugSphere(GetWorld(), HeadPos, 4.f, 4, FColor::Yellow, false, -1.f, 0, .5f);
 	}
 
 	// Keep target if still valid, alive, and within range; otherwise auto-scan
@@ -358,7 +359,7 @@ void UCameraFocusComponent::UpdateZoom(const TArray<AActor*>& NearbyEnemies, flo
 			+ MaxDist * SpreadZoomFactor;
 	}
 
-	DesiredArmLength = FMath::Clamp(DesiredArmLength, BaseArmLength, BaseArmLength * 2.0);
+	DesiredArmLength = FMath::Clamp(DesiredArmLength, BaseArmLength, BaseArmLength * MaxArmLengthMultiplier);
 
 	// --- Smooth damp (critically-damped spring) ---
 	// Naturally produces ease-in / ease-out.  ZoomMaxSpeed caps peak velocity.
