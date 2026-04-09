@@ -101,7 +101,9 @@ void UPlayerCombatInteractionComponent::ResetCombatState()
 	GetWorld()->GetTimerManager().ClearTimer(PendingHitTimer);
 	GetWorld()->GetTimerManager().ClearTimer(HitRecoveryTimer);
 	GetWorld()->GetTimerManager().ClearTimer(DodgeCooldownTimer);
+	GetWorld()->GetTimerManager().ClearTimer(BlockCooldownTimer);
 	bCanDodge = true;
+	bCanBlock = true;
 }
 
 EAttackResponse UPlayerCombatInteractionComponent::ApplyDamage(const FAttackPayload& Payload)
@@ -249,10 +251,26 @@ void UPlayerCombatInteractionComponent::StartBlock()
 		return;
 	}
 
+	// 쿨다운 중에는 몽타주 없이 Blocking 상태로 전환 (Parry Window 방지)
+	if (!bCanBlock)
+	{
+		SetDefenceState(EDefenceState::Blocking);
+		return;
+	}
+
 	SetDefenceState(EDefenceState::Parrying);
 
 	// BlockStart 몽타주 재생 (AnimNotifyState_ParryWindow 포함)
-	PlayDefenceMontage(BlockStartMontage);
+	if (PlayDefenceMontage(BlockStartMontage))
+	{
+		bCanBlock = false;
+		GetWorld()->GetTimerManager().SetTimer(
+			BlockCooldownTimer, FTimerDelegate::CreateWeakLambda(this, [this]()
+			{
+				bCanBlock = true;
+			}),
+			BlockCooldown, false);
+	}
 }
 
 void UPlayerCombatInteractionComponent::StopBlock()
