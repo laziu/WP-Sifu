@@ -20,6 +20,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category=Clear)
 	int32 DeathCount = 0;
 
+	/** Previous best (minimum) death count. Set before calling PlayFadeIn. -1 means no prior record. */
+	UPROPERTY(BlueprintReadOnly, Category=Clear)
+	int32 PrevMinDeathCount = -1;
+
 	/** Play the fade-in animation. Override in Blueprint. */
 	UFUNCTION(BlueprintImplementableEvent, Category=Clear)
 	void PlayFadeIn();

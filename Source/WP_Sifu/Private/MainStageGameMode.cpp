@@ -195,6 +195,10 @@ void AMainStageGameMode::OnStageClear()
 	if (!ClearWidget) return;
 
 	ClearWidget->DeathCount = DeathCount;
+	if (UWP_GameInstance* GI = GetGameInstance<UWP_GameInstance>())
+	{
+		ClearWidget->PrevMinDeathCount = GI->GetBestDeathCount();
+	}
 	ClearWidget->AddToViewport();
 	ClearWidget->PlayFadeIn();
 
