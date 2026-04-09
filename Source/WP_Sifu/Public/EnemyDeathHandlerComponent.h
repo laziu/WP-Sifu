@@ -19,5 +19,10 @@ public:
 
 protected:
 	virtual void OnDeathBegin() override;
+	virtual void OnDeathMontageStarted(class UAnimInstance* AnimInstance) override;
 	virtual void OnDeathComplete() override;
+
+private:
+	UPROPERTY(EditAnywhere, Category=Death)
+	TArray<FName> DeathSections;
 };

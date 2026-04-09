@@ -4,6 +4,7 @@
 #include "EnemyDeathHandlerComponent.h"
 
 #include "UserExtension.h"
+#include "Animation/AnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -14,6 +15,8 @@ UEnemyDeathHandlerComponent::UEnemyDeathHandlerComponent()
 {
 	Ext::SetObject(DeathMontage,
 		TEXT("/Script/Engine.AnimMontage'/Game/ART_FROM_SIFU/Enemy/SK_Servant_M_Hideout00_CasualDisciple_01/SkeletalMeshes/AM_Death.AM_Death'"));
+
+	DeathSections = {TEXT("Death_A"), TEXT("Death_B"), TEXT("Death_C")};
 }
 
 
@@ -33,6 +36,17 @@ void UEnemyDeathHandlerComponent::OnDeathBegin()
 		// Disable capsule collision so the corpse doesn't block movement
 		Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+}
+
+void UEnemyDeathHandlerComponent::OnDeathMontageStarted(UAnimInstance* AnimInstance)
+{
+	if (!AnimInstance || !DeathMontage || DeathSections.IsEmpty())
+	{
+		return;
+	}
+
+	const int32 Index = FMath::RandRange(0, DeathSections.Num() - 1);
+	AnimInstance->Montage_JumpToSection(DeathSections[Index], DeathMontage);
 }
 
 
