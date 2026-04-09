@@ -4,11 +4,6 @@
 #include "CombatInteractionComponentBase.h"
 #include "EnemyCombatInteractionComponent.generated.h"
 
-class UAbilitySystemComponent;
-class UAnimMontage;
-class UAttributeSet;
-class UHealthAttributeSet;
-
 UENUM(BlueprintType)
 enum class EEnemyReactionType : uint8
 {
@@ -39,14 +34,14 @@ protected:
 
 private:
 	UFUNCTION()
-	void HandleStructureChanged(UAttributeSet* AttributeSet, float OldValue, float NewValue);
+	void HandleStructureChanged(class UAttributeSet* AttributeSet, float OldValue, float NewValue);
 
 	void ApplyHitDamage(const FAttackPayload& Payload);
 	bool ShouldBlockAttack(const FAttackPayload& Payload) const;
 	void EnterStun();
 	void ExitStun();
 	void BreakStun();
-	bool PlayReactionMontage(UAnimMontage* Montage, const TArray<FName>& Sections);
+	bool PlayReactionMontage(class UAnimMontage* Montage, const TArray<FName>& Sections);
 	void SetReaction(EEnemyReactionType NewReaction) { ReactionType = NewReaction; }
 
 private:

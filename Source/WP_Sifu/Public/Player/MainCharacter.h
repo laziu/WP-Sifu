@@ -8,8 +8,6 @@
 #include "Attackable.h"
 #include "MainCharacter.generated.h"
 
-class UPlayerDeathHandlerComponent;
-
 UCLASS()
 class WP_SIFU_API AMainCharacter :
 	public AInputBindableCharacter,
@@ -59,7 +57,7 @@ public: // --- Components ---
 	TArray<TObjectPtr<class UAttackCollisionComponent>> AttackCollisions;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Death)
-	TObjectPtr<UPlayerDeathHandlerComponent> PlayerDeathHandler;
+	TObjectPtr<class UPlayerDeathHandlerComponent> PlayerDeathHandler;
 
 	UPROPERTY()
 	TObjectPtr<class UHealthAttributeSet> HealthAttributes;
