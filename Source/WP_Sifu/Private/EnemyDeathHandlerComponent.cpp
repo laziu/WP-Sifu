@@ -29,6 +29,9 @@ void UEnemyDeathHandlerComponent::OnDeathBegin()
 
 		// Stop all movement
 		Character->GetCharacterMovement()->DisableMovement();
+
+		// Disable capsule collision so the corpse doesn't block movement
+		Character->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
