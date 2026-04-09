@@ -15,7 +15,8 @@ public class WP_Sifu : ModuleRules
 			"UMG", "Slate", "SlateCore",
 			"AIModule", "StateTreeModule", "GameplayStateTreeModule",
 			"GameplayAbilities", "GameplayTags", "GameplayTasks", "NavigationSystem",
-			"GameplayTagIndexer"
+			"GameplayTagIndexer",
+			"CinematicCamera"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
