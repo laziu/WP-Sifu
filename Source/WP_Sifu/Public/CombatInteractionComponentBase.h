@@ -74,4 +74,7 @@ public: // --- Combat state ---
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Combat)
 	EDefenceState DefenceState = EDefenceState::None;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Combat)
+	double DefaultDamage = 3.0;
 };
