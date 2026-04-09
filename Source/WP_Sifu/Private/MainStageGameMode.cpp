@@ -35,9 +35,10 @@ void AMainStageGameMode::BeginPlay()
 		if (It->DeathHandler)
 		{
 			AliveEnemyCount++;
-			It->DeathHandler->OnDeathFinished.AddDynamic(this, &AMainStageGameMode::OnEnemyDied);
+			It->DeathHandler->OnDeathStarted.AddDynamic(this, &AMainStageGameMode::OnEnemyDied);
 		}
 	}
+	LOGW(TEXT("Alive enemies at start: %d"), AliveEnemyCount);
 
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 	APawn* Pawn = PC ? PC->GetPawn() : nullptr;
@@ -157,6 +158,7 @@ void AMainStageGameMode::OnIntroComplete()
 void AMainStageGameMode::OnEnemyDied()
 {
 	AliveEnemyCount = FMath::Max(0, AliveEnemyCount - 1);
+	LOGW(TEXT("Enemy died. Remaining: %d"), AliveEnemyCount);
 	if (AliveEnemyCount == 0)
 	{
 		OnStageClear();
