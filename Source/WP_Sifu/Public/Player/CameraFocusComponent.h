@@ -74,6 +74,10 @@ protected: // --- Zoom Config ---
 	/// Base arm length (no enemies).
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Zoom)
 	double BaseArmLength = 120.;
+	
+	/// Max arm multiplier.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Zoom)
+	double MaxArmLengthMultiplier = 3.;
 
 	/// Additional arm length per nearby enemy.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category=Zoom)
