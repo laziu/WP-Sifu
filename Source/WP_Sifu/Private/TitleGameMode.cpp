@@ -49,7 +49,7 @@ void ATitleGameMode::RequestStartGame()
 	GetWorldTimerManager().SetTimer(
 		FadeOutTimerHandle,
 		this, &ATitleGameMode::OnFadeOutTimerComplete,
-		0.5f, false);
+		1.f, false);
 }
 
 void ATitleGameMode::OnFadeOutTimerComplete()
