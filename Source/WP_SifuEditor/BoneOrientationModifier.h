@@ -5,8 +5,6 @@
 #include "AnimationModifier.h"
 #include "BoneOrientationModifier.generated.h"
 
-class UAnimSequence;
-
 UCLASS(meta = (DisplayName = "Bone Orientation Modifier"))
 class WP_SIFUEDITOR_API UBoneOrientationModifier : public UAnimationModifier
 {
@@ -21,9 +19,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float YawDegrees = 90.f;
 
-	virtual void OnApply_Implementation(UAnimSequence* AnimationSequence) override;
-	virtual void OnRevert_Implementation(UAnimSequence* AnimationSequence) override;
+	virtual void OnApply_Implementation(class UAnimSequence* AnimationSequence) override;
+	virtual void OnRevert_Implementation(class UAnimSequence* AnimationSequence) override;
 
 private:
-	void RotateBoneTrack(UAnimSequence* AnimationSequence, const FQuat& Delta);
+	void RotateBoneTrack(class UAnimSequence* AnimationSequence, const FQuat& Delta);
 };

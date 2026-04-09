@@ -132,9 +132,6 @@ void UAttackCollisionManagerComponent::HandleHit(AActor* HitActor, const FHitRes
 
 	FAttackPayload Payload = CombatComp->MakeCurrentAttackPayload();
 	Payload.ImpactLocation = HitResult.ImpactPoint;
-	Payload.HealthDamage = 3; // default damage
-	Payload.StructureDamage = 3;
-	Payload.HitReaction = GameplayTag::Hit_Reaction_None;
 
 	CombatComp->SendAttack(HitActor, Payload);
 }

@@ -11,6 +11,8 @@ FAttackPayload UCombatInteractionComponentBase::MakeCurrentAttackPayload() const
 {
 	FAttackPayload Payload;
 	Payload.Instigator = GetOwner();
+	Payload.HealthDamage = DefaultDamage;
+	Payload.StructureDamage = DefaultDamage;
 	return Payload;
 }
 

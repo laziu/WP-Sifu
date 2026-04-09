@@ -15,6 +15,7 @@ enum class EHitReactionType : uint8
 	None UMETA(DisplayName="None"),
 	Hit UMETA(DisplayName="Hit"),
 	BlockHit UMETA(DisplayName="BlockHit"),
+	Broken UMETA(DisplayName="Broken"),
 };
 
 
@@ -103,6 +104,9 @@ private: // --- Montages ---
 	UPROPERTY(EditDefaultsOnly, Category=Animation)
 	TObjectPtr<class UAnimMontage> BlockHitMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category=Animation)
+	TObjectPtr<class UAnimMontage> StructureBrokenMontage;
+
 	bool PlayDefenceMontage(class UAnimMontage* Montage);
 
 private: // --- Dodge ---
@@ -122,6 +126,14 @@ private: // --- Late Input Buffer ---
 	FTimerHandle PendingHitTimer;
 
 	void ApplyPendingHitDamage();
+
+private: // --- Structure Broken ---
+	bool bStructureBroken = false;
+
+	UFUNCTION()
+	void HandleStructureChanged(UAttributeSet* AttributeSet, float OldValue, float NewValue);
+
+	void OnStructureBroken();
 
 private:
 	UFUNCTION()

@@ -6,8 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "PlayerDeathScreenWidget.generated.h"
 
-class UPlayerDeathHandlerComponent;
-
 /**
  * Base C++ class for the player death screen widget.
  * Create a UMG Blueprint inheriting from this class for visuals.
@@ -23,7 +21,7 @@ public:
 	 * Called from C++ to initialize and start the death screen sequence.
 	 * Override PlayDeathSequence in Blueprint to implement the visual animation.
 	 */
-	void Show(UPlayerDeathHandlerComponent* InOwnerComponent, int32 InDeathCount);
+	void Show(class UPlayerDeathHandlerComponent* InOwnerComponent, int32 InDeathCount);
 
 protected:
 	/** Override in Blueprint to play the aging/death animation sequence.
@@ -39,5 +37,5 @@ protected:
 	int32 DeathCount = 0;
 
 	UPROPERTY(BlueprintReadOnly, Category=Death)
-	TObjectPtr<UPlayerDeathHandlerComponent> OwnerDeathHandler;
+	TObjectPtr<class UPlayerDeathHandlerComponent> OwnerDeathHandler;
 };

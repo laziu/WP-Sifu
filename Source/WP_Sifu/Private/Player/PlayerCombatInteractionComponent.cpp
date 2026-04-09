@@ -43,6 +43,10 @@ UPlayerCombatInteractionComponent::UPlayerCombatInteractionComponent()
 		BlockHitMontage,
 		TEXT(
 			"/Script/Engine.AnimMontage'/Game/ART_FROM_SIFU/Player/SK_M_MainChar_01/Anims/Montages/AM_MainChar_HitBlock.AM_MainChar_HitBlock'"));
+	Ext::SetObject(
+		StructureBrokenMontage,
+		TEXT(
+			"/Script/Engine.AnimMontage'/Game/ART_FROM_SIFU/Player/SK_M_MainChar_01/Anims/Montages/AM_MainChar_Broken.AM_MainChar_Broken'"));
 }
 
 void UPlayerCombatInteractionComponent::SetupInputBindings(UEnhancedInputComponent* EIC)
@@ -77,6 +81,12 @@ void UPlayerCombatInteractionComponent::BeginPlay()
 	{
 		DeathComp->OnDeathStarted.AddDynamic(this, &UPlayerCombatInteractionComponent::ResetCombatState);
 	}
+
+	if (const auto* HealthAttr = AbilitySystemComp->GetSet<UHealthAttributeSet>())
+	{
+		const_cast<UHealthAttributeSet*>(HealthAttr)->OnStructureChanged.AddDynamic(
+			this, &UPlayerCombatInteractionComponent::HandleStructureChanged);
+	}
 }
 
 void UPlayerCombatInteractionComponent::ResetCombatState()
@@ -84,6 +94,7 @@ void UPlayerCombatInteractionComponent::ResetCombatState()
 	SetDefenceState(EDefenceState::None);
 	bBlockKeyHeld = false;
 	bHitRecoveryMovementLock = false;
+	bStructureBroken = false;
 	HitReactionType = EHitReactionType::None;
 	HitDirection = FVector2D::ZeroVector;
 	PendingHitPayload.Reset();
@@ -116,7 +127,10 @@ EAttackResponse UPlayerCombatInteractionComponent::ApplyDamage(const FAttackPayl
 				UHealthAttributeSet::GetStructureAttribute(),
 				EGameplayModOp::Additive, Payload.StructureDamage);
 
-			SetHitReaction(EHitReactionType::BlockHit, Payload.ImpactLocation);
+			if (!bStructureBroken)
+			{
+				SetHitReaction(EHitReactionType::BlockHit, Payload.ImpactLocation);
+			}
 
 			// Transfer camera focus to the attacker
 			if (Payload.Instigator.IsValid())
@@ -348,17 +362,52 @@ void UPlayerCombatInteractionComponent::SetHitReaction(EHitReactionType Type, co
 
 void UPlayerCombatInteractionComponent::OnHitReactionEnd()
 {
+	if (bStructureBroken)
+	{
+		bStructureBroken = false;
+		AbilitySystemComp->SetNumericAttributeBase(UHealthAttributeSet::GetStructureAttribute(), 0.f);
+	}
+
 	HitReactionType = EHitReactionType::None;
 	HitDirection = FVector2D::ZeroVector;
 }
 
 bool UPlayerCombatInteractionComponent::IsMovementBlocked() const
 {
-	return DefenceState == EDefenceState::Blocking || bHitRecoveryMovementLock;
+	return DefenceState == EDefenceState::Blocking || bHitRecoveryMovementLock || bStructureBroken;
+}
+
+// ── Structure Broken ─────────────────────────────────────────
+
+void UPlayerCombatInteractionComponent::HandleStructureChanged(UAttributeSet* AttributeSet, float OldValue, float NewValue)
+{
+	const auto* HealthAttr = Cast<UHealthAttributeSet>(AttributeSet);
+	if (!HealthAttr || bStructureBroken)
+		return;
+
+	if (NewValue >= HealthAttr->GetMaxStructure() && OldValue < HealthAttr->GetMaxStructure())
+	{
+		OnStructureBroken();
+	}
+}
+
+void UPlayerCombatInteractionComponent::OnStructureBroken()
+{
+	bStructureBroken = true;
+
+	// 진행 중인 피격 관련 타이머 취소
+	GetWorld()->GetTimerManager().ClearTimer(HitRecoveryTimer);
+	bHitRecoveryMovementLock = false;
+	GetWorld()->GetTimerManager().ClearTimer(PendingHitTimer);
+	PendingHitPayload.Reset();
+
+	HitReactionType = EHitReactionType::Broken;
+	HitDirection = FVector2D::ZeroVector;
+
+	PlayDefenceMontage(StructureBrokenMontage);
 }
 
 // ── Montage Helper ──────────────────────────────────────────
-
 bool UPlayerCombatInteractionComponent::PlayDefenceMontage(UAnimMontage* Montage)
 {
 	if (!Montage) return false;
@@ -393,11 +442,13 @@ void UPlayerCombatInteractionComponent::ApplyPendingHitDamage()
 		UHealthAttributeSet::GetStructureAttribute(),
 		EGameplayModOp::Additive, Payload.StructureDamage);
 
-	// Skip hit reaction if the damage killed the character
+	// Skip hit reaction if the damage killed the character or triggered structure break
 	if (auto* DeathComp = GetOwner()->FindComponentByClass<UDeathHandlerComponentBase>())
 	{
 		if (DeathComp->IsDead()) return;
 	}
+
+	if (bStructureBroken) return;
 
 	SetHitReaction(EHitReactionType::Hit, Payload.ImpactLocation);
 

@@ -6,8 +6,6 @@
 #include "DeathHandlerComponentBase.h"
 #include "PlayerDeathHandlerComponent.generated.h"
 
-class UPlayerDeathScreenWidget;
-
 /**
  * Player death handler: plays aging overlay, increments age, then revives.
  */
@@ -23,7 +21,7 @@ public:
 	TObjectPtr<UAnimMontage> ReviveMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category=Death)
-	TSubclassOf<UPlayerDeathScreenWidget> DeathScreenWidgetClass;
+	TSubclassOf<class UPlayerDeathScreenWidget> DeathScreenWidgetClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Death)
 	int32 DeathCount = 0;
@@ -46,5 +44,5 @@ private:
 	void RestoreHealth();
 
 	UPROPERTY()
-	TObjectPtr<UPlayerDeathScreenWidget> DeathScreenInstance;
+	TObjectPtr<class UPlayerDeathScreenWidget> DeathScreenInstance;
 };
