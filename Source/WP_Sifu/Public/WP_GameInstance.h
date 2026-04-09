@@ -27,6 +27,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category=Loading)
 	void ShowLoadingScreen(bool bWithFadeIn = true);
 
+	/**
+	 * Show the loading screen, wait MinLoadingScreenSeconds, then open the given level.
+	 * Callers should NOT call OpenLevel themselves.
+	 */
+	UFUNCTION(BlueprintCallable, Category=Loading)
+	void ShowLoadingScreenAndOpenLevel(FName LevelName, bool bWithFadeIn = true);
+
 	/** Fade out and remove the loading screen. */
 	UFUNCTION(BlueprintCallable, Category=Loading)
 	void HideLoadingScreen();
@@ -46,13 +53,23 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category=UI)
 	TSubclassOf<class ULoadingScreenWidget> LoadingWidgetClass;
 
+	/** Minimum seconds the loading screen stays visible before fading out. */
+	UPROPERTY(EditDefaultsOnly, Category=Loading)
+	float MinLoadingScreenSeconds = 3.f;
+
 private:
 	void CreateAndShowLoadingWidget(bool bPlayFadeIn);
+	void OnLoadingDelayComplete();
 
 	int32 BestDeathCount = INT32_MAX;
 
 	/** True while a level is loading so OnWorldChanged re-creates the widget. */
 	bool bLoadingScreenPending = false;
+
+	/** Level name to open after the loading screen delay. */
+	FName PendingLevelName;
+
+	FTimerHandle LoadingScreenDelayTimer;
 
 	UPROPERTY()
 	TObjectPtr<class ULoadingScreenWidget> LoadingWidgetInstance;

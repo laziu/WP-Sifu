@@ -47,16 +47,42 @@ void UWP_GameInstance::ShowLoadingScreen(bool bWithFadeIn)
 	CreateAndShowLoadingWidget(bWithFadeIn);
 }
 
+void UWP_GameInstance::ShowLoadingScreenAndOpenLevel(FName LevelName, bool bWithFadeIn)
+{
+	ShowLoadingScreen(bWithFadeIn);
+
+	PendingLevelName = LevelName;
+
+	if (UWorld* World = GetWorld())
+	{
+		FTimerDelegate TimerDel;
+		TimerDel.BindUObject(this, &UWP_GameInstance::OnLoadingDelayComplete);
+		World->GetTimerManager().SetTimer(LoadingScreenDelayTimer, TimerDel, MinLoadingScreenSeconds, false);
+	}
+}
+
 void UWP_GameInstance::HideLoadingScreen()
 {
 	bLoadingScreenPending = false;
 
 	if (LoadingWidgetInstance)
 	{
-		// PlayFadeOut is a BlueprintImplementableEvent; the widget calls
-		// NotifyFadeOutComplete() → RemoveFromParent() when animation ends.
 		LoadingWidgetInstance->PlayFadeOut();
 		LoadingWidgetInstance = nullptr;
+	}
+}
+
+void UWP_GameInstance::OnLoadingDelayComplete()
+{
+	if (!PendingLevelName.IsNone())
+	{
+		FName LevelToOpen = PendingLevelName;
+		PendingLevelName = NAME_None;
+
+		// Clear pending flag so OnWorldChanged won't re-create the widget in the new world.
+		bLoadingScreenPending = false;
+
+		UGameplayStatics::OpenLevel(this, LevelToOpen);
 	}
 }
 
@@ -84,15 +110,9 @@ void UWP_GameInstance::CreateAndShowLoadingWidget(bool bPlayFadeIn)
 		return;
 	}
 
-	UWorld* World = GetWorld();
-	APlayerController* PC = World ? World->GetFirstPlayerController() : nullptr;
-	if (!PC)
-	{
-		LOGW(TEXT("No PlayerController available when creating loading widget."));
-		return;
-	}
-
-	LoadingWidgetInstance = CreateWidget<ULoadingScreenWidget>(PC, LoadingWidgetClass);
+	// Use GameInstance as the owning object so the widget can be created
+	// even before a PlayerController exists in the new world.
+	LoadingWidgetInstance = CreateWidget<ULoadingScreenWidget>(this, LoadingWidgetClass);
 	if (!LoadingWidgetInstance)
 	{
 		return;
