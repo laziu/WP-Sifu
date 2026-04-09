@@ -46,10 +46,10 @@ private:
 
 private:
 	UPROPERTY(EditAnywhere, Category=Combat, meta=(ClampMin="0.0", ClampMax="1.0"))
-	float BlockChance = 0.35f;
+	float BlockChance = 0.4f;
 
 	UPROPERTY(EditAnywhere, Category=Combat, meta=(ClampMin="0.1"))
-	float StunDuration = 3.5f;
+	float StunDuration = 4.5f;
 
 	UPROPERTY(EditDefaultsOnly, Category=Animation)
 	TObjectPtr<class UAnimMontage> HitMontage;

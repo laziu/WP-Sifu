@@ -60,6 +60,8 @@ void UDeathHandlerComponentBase::HandleHealthDepleted()
 	const float Duration = AnimInstance->Montage_Play(DeathMontage);
 	if (Duration > 0.f)
 	{
+		OnDeathMontageStarted(AnimInstance);
+
 		FOnMontageEnded EndDelegate;
 		EndDelegate.BindUObject(this, &UDeathHandlerComponentBase::OnDeathMontageEnded);
 		AnimInstance->Montage_SetEndDelegate(EndDelegate, DeathMontage);

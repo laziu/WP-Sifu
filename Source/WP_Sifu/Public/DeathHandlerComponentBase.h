@@ -39,6 +39,9 @@ protected:
 	UFUNCTION()
 	void OnDeathMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
+	/** Called immediately after the death montage starts playing. */
+	virtual void OnDeathMontageStarted(class UAnimInstance* AnimInstance) {}
+
 	/** Subclasses implement post-death-montage behavior */
 	virtual void OnDeathComplete() {}
 
