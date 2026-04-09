@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
+#include "Interface/Attackable.h"
 #include "AttackCollisionManagerComponent.generated.h"
 
 
@@ -56,6 +57,20 @@ private: // --- State ---
 
 	/// OnAttackHit subscription handles for registered persistent collisions
 	TMap<FGameplayTag, FDelegateHandle> HitDelegateHandles;
+
+private: // --- Hit Stop ---
+	UPROPERTY(EditAnywhere, Category = "Hit Stop")
+	bool bEnableHitStop = true;
+
+	UPROPERTY(EditAnywhere, Category = "Hit Stop", meta = (EditCondition = "bEnableHitStop"))
+	float HitStopTimeDilation = 0.02f;
+
+	UPROPERTY(EditAnywhere, Category = "Hit Stop", meta = (EditCondition = "bEnableHitStop"))
+	float HitStopDuration = 0.06f;
+
+	FTimerHandle HitStopTimerHandle;
+
+	void ApplyHitStop();
 
 private: // --- Internal ---
 	void HandleHit(AActor* HitActor, const FHitResult& HitResult);

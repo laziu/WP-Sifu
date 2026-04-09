@@ -195,6 +195,10 @@ void AMainStageGameMode::OnStageClear()
 	if (!ClearWidget) return;
 
 	ClearWidget->DeathCount = DeathCount;
+	if (UWP_GameInstance* GI = GetGameInstance<UWP_GameInstance>())
+	{
+		ClearWidget->PrevMinDeathCount = GI->GetBestDeathCount();
+	}
 	ClearWidget->AddToViewport();
 	ClearWidget->PlayFadeIn();
 
@@ -228,11 +232,9 @@ void AMainStageGameMode::TransitionToLevel(FName LevelName)
 		}
 	}
 
-	// Show the loading screen immediately (no fade-in: instant blackout).
+	// Show the loading screen, wait, then open the level.
 	if (UWP_GameInstance* GI = GetGameInstance<UWP_GameInstance>())
 	{
-		GI->ShowLoadingScreen(false);
+		GI->ShowLoadingScreenAndOpenLevel(LevelName, false);
 	}
-
-	UGameplayStatics::OpenLevel(this, LevelName);
 }

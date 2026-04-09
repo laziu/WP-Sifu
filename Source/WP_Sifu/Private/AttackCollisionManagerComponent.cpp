@@ -9,6 +9,7 @@
 #include "Weapon/WeaponBase.h"
 #include "WP_Sifu.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 
 
 UAttackCollisionManagerComponent::UAttackCollisionManagerComponent()
@@ -133,5 +134,36 @@ void UAttackCollisionManagerComponent::HandleHit(AActor* HitActor, const FHitRes
 	FAttackPayload Payload = CombatComp->MakeCurrentAttackPayload();
 	Payload.ImpactLocation = HitResult.ImpactPoint;
 
-	CombatComp->SendAttack(HitActor, Payload);
+	EAttackResponse Response = CombatComp->SendAttack(HitActor, Payload);
+
+	if (Response == EAttackResponse::Hit
+		|| Response == EAttackResponse::Block
+		|| Response == EAttackResponse::Parry)
+	{
+		ApplyHitStop();
+	}
+}
+
+
+void UAttackCollisionManagerComponent::ApplyHitStop()
+{
+	if (!bEnableHitStop) return;
+
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	World->GetTimerManager().ClearTimer(HitStopTimerHandle);
+
+	UGameplayStatics::SetGlobalTimeDilation(this, HitStopTimeDilation);
+
+	FTimerDelegate Delegate;
+	Delegate.BindWeakLambda(this, [this]()
+	{
+		UGameplayStatics::SetGlobalTimeDilation(this, 1.0f);
+	});
+
+	// Timer runs in dilated game-time, so compensate duration
+	const float AdjustedDuration = HitStopDuration * HitStopTimeDilation;
+	World->GetTimerManager().SetTimer(
+		HitStopTimerHandle, Delegate, AdjustedDuration, false);
 }

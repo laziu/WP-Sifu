@@ -101,11 +101,45 @@ void UPlayerCombatInteractionComponent::ResetCombatState()
 	GetWorld()->GetTimerManager().ClearTimer(PendingHitTimer);
 	GetWorld()->GetTimerManager().ClearTimer(HitRecoveryTimer);
 	GetWorld()->GetTimerManager().ClearTimer(DodgeCooldownTimer);
+	GetWorld()->GetTimerManager().ClearTimer(BlockCooldownTimer);
 	bCanDodge = true;
+	bCanBlock = true;
 }
 
 EAttackResponse UPlayerCombatInteractionComponent::ApplyDamage(const FAttackPayload& Payload)
 {
+	// Structure broken → 즉시 Idle 복귀 + 피격 리액션
+	if (bStructureBroken)
+	{
+		bStructureBroken = false;
+		AbilitySystemComp->SetNumericAttributeBase(UHealthAttributeSet::GetStructureAttribute(), 0.f);
+		SetDefenceState(EDefenceState::None);
+
+		AbilitySystemComp->ApplyModToAttribute(
+			UHealthAttributeSet::GetHealthAttribute(),
+			EGameplayModOp::Additive, -Payload.HealthDamage);
+		AbilitySystemComp->ApplyModToAttribute(
+			UHealthAttributeSet::GetStructureAttribute(),
+			EGameplayModOp::Additive, Payload.StructureDamage);
+
+		if (auto* DeathComp = GetOwner()->FindComponentByClass<UDeathHandlerComponentBase>())
+		{
+			if (DeathComp->IsDead()) return EAttackResponse::Hit;
+		}
+
+		SetHitReaction(EHitReactionType::Hit, Payload.ImpactLocation);
+
+		if (Payload.Instigator.IsValid())
+		{
+			if (auto* FocusComp = GetOwner()->FindComponentByClass<UCameraFocusComponent>())
+			{
+				FocusComp->SetFocusTarget(Payload.Instigator.Get());
+			}
+		}
+
+		return EAttackResponse::Hit;
+	}
+
 	switch (DefenceState)
 	{
 	case EDefenceState::None:
@@ -217,10 +251,26 @@ void UPlayerCombatInteractionComponent::StartBlock()
 		return;
 	}
 
+	// 쿨다운 중에는 몽타주 없이 Blocking 상태로 전환 (Parry Window 방지)
+	if (!bCanBlock)
+	{
+		SetDefenceState(EDefenceState::Blocking);
+		return;
+	}
+
 	SetDefenceState(EDefenceState::Parrying);
 
 	// BlockStart 몽타주 재생 (AnimNotifyState_ParryWindow 포함)
-	PlayDefenceMontage(BlockStartMontage);
+	if (PlayDefenceMontage(BlockStartMontage))
+	{
+		bCanBlock = false;
+		GetWorld()->GetTimerManager().SetTimer(
+			BlockCooldownTimer, FTimerDelegate::CreateWeakLambda(this, [this]()
+			{
+				bCanBlock = true;
+			}),
+			BlockCooldown, false);
+	}
 }
 
 void UPlayerCombatInteractionComponent::StopBlock()

@@ -80,7 +80,11 @@ private:
 	TObjectPtr<class UAbilitySystemComponent> AbilitySystemComp;
 
 private: // --- Parry/Block ---
+	static constexpr float BlockCooldown = 0.25f;
+
 	bool bBlockKeyHeld = false;
+	bool bCanBlock = true;
+	FTimerHandle BlockCooldownTimer;
 	bool bHitRecoveryMovementLock = false;
 	FTimerHandle HitRecoveryTimer;
 	static constexpr float HitRecoveryLockDuration = 0.2f;

@@ -36,6 +36,12 @@ void ATitleGameMode::BeginPlay()
 
 	PC->bShowMouseCursor = true;
 	PC->SetInputMode(FInputModeUIOnly());
+
+	// Hide loading screen (applies when returning from MainStage → Title).
+	if (UWP_GameInstance* GI = GetGameInstance<UWP_GameInstance>())
+	{
+		GI->HideLoadingScreen();
+	}
 }
 
 void ATitleGameMode::RequestStartGame()
@@ -56,10 +62,8 @@ void ATitleGameMode::OnFadeOutTimerComplete()
 {
 	if (UWP_GameInstance* GI = GetGameInstance<UWP_GameInstance>())
 	{
-		GI->ShowLoadingScreen(true);
+		GI->ShowLoadingScreenAndOpenLevel(TEXT("Lvl_MainStage"), true);
 	}
-
-	UGameplayStatics::OpenLevel(this, TEXT("Lvl_MainStage"));
 }
 
 void ATitleGameMode::RequestQuitGame()
