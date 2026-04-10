@@ -139,6 +139,31 @@ private: // --- Structure Broken ---
 
 	void OnStructureBroken();
 
+private: // --- Camera Shake ---
+	/// 플레이어 공격이 적에게 히트했을 때
+	UPROPERTY(EditDefaultsOnly, Category="CameraShake|Attack")
+	TSubclassOf<UCameraShakeBase> AttackHitShake;
+
+	/// 플레이어 공격을 적이 블록했을 때
+	UPROPERTY(EditDefaultsOnly, Category="CameraShake|Attack")
+	TSubclassOf<UCameraShakeBase> AttackBlockedShake;
+
+	/// 플레이어가 블록에 성공했을 때
+	UPROPERTY(EditDefaultsOnly, Category="CameraShake|Defence")
+	TSubclassOf<UCameraShakeBase> DefendBlockShake;
+
+	/// 플레이어가 패링에 성공했을 때
+	UPROPERTY(EditDefaultsOnly, Category="CameraShake|Defence")
+	TSubclassOf<UCameraShakeBase> DefendParryShake;
+
+	UPROPERTY(EditDefaultsOnly, Category="CameraShake", meta=(ClampMin="0.0", ClampMax="5.0"))
+	float ShakeScale = 1.0f;
+
+	void PlayCameraShake(TSubclassOf<UCameraShakeBase> ShakeClass) const;
+
+	UFUNCTION()
+	void HandleAttackSent(AActor* Target, const FAttackPayload& Payload, EAttackResponse Response);
+
 private:
 	UFUNCTION()
 	void ResetCombatState();
