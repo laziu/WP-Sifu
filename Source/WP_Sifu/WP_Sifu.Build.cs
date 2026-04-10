@@ -11,7 +11,7 @@ public class WP_Sifu : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
 			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
-			"AnimGraph", "AnimGraphRuntime", "Niagara",
+			"AnimGraphRuntime", "Niagara",
 			"UMG", "Slate", "SlateCore",
 			"AIModule", "StateTreeModule", "GameplayStateTreeModule",
 			"GameplayAbilities", "GameplayTags", "GameplayTasks", "NavigationSystem",
