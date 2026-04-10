@@ -14,6 +14,7 @@
 #include "HealthAttributeSet.h"
 #include "PlayerAttackComponent.h"
 #include "WP_Sifu.h"
+#include "Camera/CameraShakeBase.h"
 #include "GameFramework/Character.h"
 
 
@@ -87,6 +88,9 @@ void UPlayerCombatInteractionComponent::BeginPlay()
 		const_cast<UHealthAttributeSet*>(HealthAttr)->OnStructureChanged.AddDynamic(
 			this, &UPlayerCombatInteractionComponent::HandleStructureChanged);
 	}
+
+	// Attacker-side camera shake: fires when our attack lands on an enemy
+	OnAttackSent.AddDynamic(this, &UPlayerCombatInteractionComponent::HandleAttackSent);
 }
 
 void UPlayerCombatInteractionComponent::ResetCombatState()
@@ -166,16 +170,17 @@ EAttackResponse UPlayerCombatInteractionComponent::ApplyDamage(const FAttackPayl
 				SetHitReaction(EHitReactionType::BlockHit, Payload.ImpactLocation);
 			}
 
-			// Transfer camera focus to the attacker
-			if (Payload.Instigator.IsValid())
+		// Transfer camera focus to the attacker
+		if (Payload.Instigator.IsValid())
+		{
+			if (auto* FocusComp = GetOwner()->FindComponentByClass<UCameraFocusComponent>())
 			{
-				if (auto* FocusComp = GetOwner()->FindComponentByClass<UCameraFocusComponent>())
-				{
-					FocusComp->SetFocusTarget(Payload.Instigator.Get());
-				}
+				FocusComp->SetFocusTarget(Payload.Instigator.Get());
 			}
+		}
 
-			return EAttackResponse::Block;
+		PlayCameraShake(DefendBlockShake);
+		return EAttackResponse::Block;
 		}
 
 	case EDefenceState::Dodging:
@@ -206,13 +211,14 @@ EAttackResponse UPlayerCombatInteractionComponent::ApplyDamage(const FAttackPayl
 				SendAttack(Payload.Instigator.Get(), ReflectPayload);
 			}
 
-			// Parry 성공 → 콤보 컴포넌트에 알림
-			if (auto* AttackComp = GetOwner()->FindComponentByClass<UPlayerAttackComponent>())
-			{
-				AttackComp->SetState(GameplayTag::Combat_State_Parry);
-			}
+		// Parry 성공 → 콤보 컴포넌트에 알림
+		if (auto* AttackComp = GetOwner()->FindComponentByClass<UPlayerAttackComponent>())
+		{
+			AttackComp->SetState(GameplayTag::Combat_State_Parry);
+		}
 
-			return EAttackResponse::Parry;
+		PlayCameraShake(DefendParryShake);
+		return EAttackResponse::Parry;
 		}
 
 	case EDefenceState::Invincible:
@@ -511,3 +517,34 @@ void UPlayerCombatInteractionComponent::ApplyPendingHitDamage()
 		}
 	}
 }
+
+// ── Camera Shake ─────────────────────────────────────────────
+
+void UPlayerCombatInteractionComponent::PlayCameraShake(TSubclassOf<UCameraShakeBase> ShakeClass) const
+{
+	if (!ShakeClass) return;
+
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+	{
+		PC->ClientStartCameraShake(ShakeClass, ShakeScale);
+	}
+}
+
+void UPlayerCombatInteractionComponent::HandleAttackSent(AActor* Target, const FAttackPayload& Payload, EAttackResponse Response)
+{
+	// Skip reflected/structure-only attacks (e.g., parry reflect)
+	if (Payload.HealthDamage <= 0.f) return;
+
+	switch (Response)
+	{
+	case EAttackResponse::Hit:
+		PlayCameraShake(AttackHitShake);
+		break;
+	case EAttackResponse::Block:
+		PlayCameraShake(AttackBlockedShake);
+		break;
+	default:
+		break;
+	}
+}
+
