@@ -13,7 +13,6 @@
 #include "AttackCollisionComponent.h"
 #include "AttackCollisionManagerComponent.h"
 #include "PlayerDeathHandlerComponent.h"
-#include "EnhancedInputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UserExtension.h"
 #include "GameplayTags.generated.h"

@@ -22,9 +22,3 @@ public:
 	virtual void SetupInputBindings(class UEnhancedInputComponent* EIC) = 0;
 };
 
-// --- Helper ---
-
-struct WP_SIFU_API FInputBindingHelper
-{
-	static void BindAll(AActor* Actor, UInputComponent* InputComponent);
-};

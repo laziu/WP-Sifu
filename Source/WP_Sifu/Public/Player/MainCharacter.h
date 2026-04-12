@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InputBindableCharacter.h"
+#include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "Attackable.h"
 #include "MainCharacter.generated.h"
 
 UCLASS()
 class WP_SIFU_API AMainCharacter :
-	public AInputBindableCharacter,
+	public ACharacter,
 	public IAbilitySystemInterface,
 	public IAttackable
 {
